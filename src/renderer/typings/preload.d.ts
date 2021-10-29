@@ -15,7 +15,7 @@ interface Window {
     /**
      * Instructs the main process to check for available updates.
      */
-    checkUpdates: () => void
+    checkForUpdates: () => void
 
     /**
      * Instructs the app to enter idle mode.

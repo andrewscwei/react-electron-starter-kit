@@ -1,16 +1,21 @@
 import app from './app'
 
-let _isIdle = false
+const _isIdle = false
 let idleTimeout: number | undefined
 let enterIdleModeHandler: (() => void) | undefined
 let exitIdleModeHandler: (() => void) | undefined
 
+type Options = {
+  onEnter?: () => void
+  onExit?: () => void
+}
+
 /**
  * Initiallizes the idler.
  */
-export function initIdler(onEnterIdleMode?: () => void, onExitIdleMode?: () => void) {
-  enterIdleModeHandler = onEnterIdleMode
-  exitIdleModeHandler = onExitIdleMode
+export function initIdler({ onEnter, onExit }: Options = {}) {
+  enterIdleModeHandler = onEnter
+  exitIdleModeHandler = onExit
 
   document.addEventListener('pointerup', onWindowPointerUp)
   document.addEventListener('keyup', onWindowKeyUp)

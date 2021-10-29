@@ -22,7 +22,10 @@ class App extends PureComponent<Props, State> {
   }
 
   componentDidMount() {
-    initIdler(() => this.setState({ isIdle: true} ), () => this.setState({ isIdle: false }))
+    initIdler({
+      onEnter: () => this.setState({ isIdle: true }),
+      onExit: () => this.setState({ isIdle: false }),
+    })
   }
 
   componentWillUnmount() {

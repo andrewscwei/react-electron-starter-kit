@@ -11,7 +11,12 @@ export default {
   /**
    * Time interval to check for updates in milliseconds. Defaults to 2 hours.
    */
-  checkUpdateInterval: 60 * 1000,
+  checkForUpdatesInterval: 60 * 1000,
+
+  /**
+   * Specifies if auto updater should be enabled.
+   */
+  autoUpdate: false,
 
   /**
    * Time it takes for the app to be marked as idle so auto update can kick in, in milliseconds.

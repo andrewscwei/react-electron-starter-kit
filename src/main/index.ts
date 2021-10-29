@@ -8,7 +8,9 @@ import path from 'path'
 import appConf from '../../config/app.conf'
 import IpcMainChannel from '../enums/IpcMainChannel'
 import IpcRendererChannel from '../enums/IpcRendererChannel'
-import { initRendererIdleModeEvents } from './utils/idle'
+import UpdateStatus from '../enums/UpdateStatus'
+import { hasUpdate, initAutoUpdater, quitAndInstallUpdate, startPeriodicUpdateCheck, stopPeriodicUpdateCheck } from './utils/autoUpdate'
+import { initIdler, isRendererIdle } from './utils/idle'
 import log, { disableIpcLogging, disableRendererLogging, enableIpcLogging, enableRendererLogging, isRendererLoggingEnabled } from './utils/log'
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -20,7 +22,54 @@ app.whenReady().then(() => {
 
   initWindow()
   initIpcComm()
-  initRendererIdleModeEvents()
+
+  if (isDev) require('./utils/dev').initDevEnvironment()
+
+  if (appConf.autoUpdate) {
+    initAutoUpdater({
+      onError: error => {
+        mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.ERROR, error })
+      },
+      onChecking: () => {
+        mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.CHECKING })
+      },
+      onAvailable: () => {
+        mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.AVAILABLE })
+      },
+      onUnavailable: () => {
+        mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.UNAVAILABLE })
+      },
+      onDownloading: progress => {
+        mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.DOWNLOADING, progress })
+      },
+      onDownloaded: () => {
+        if (isRendererIdle()) {
+          quitAndInstallUpdate()
+        }
+        else {
+          mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.DOWNLOADED })
+        }
+      },
+    })
+  }
+
+  initIdler({
+    onEnter: () => {
+      if (!appConf.autoUpdate) return
+
+      if (hasUpdate()) {
+        quitAndInstallUpdate()
+      }
+      else {
+        startPeriodicUpdateCheck()
+      }
+    },
+    onExit: () => {
+      if (!appConf.autoUpdate) return
+
+      stopPeriodicUpdateCheck()
+    },
+  })
 
   // On macOS it's common to re-create a window in the app when the dock icon is clicked and there
   // are no other windows open.
@@ -57,15 +106,6 @@ function initWindow() {
   if (isDev) {
     window.loadURL(`http://localhost:${Number(process.env.PORT ?? 8080)}`)
     window.webContents.openDevTools()
-
-    log.debug(`Debug environment detected, enabling auto reloading enabled for directory ${__dirname} and main module ${__filename}... OK`)
-
-    require('electron-reload')(__dirname, {
-      electron: path.join(__dirname, '../', 'node_modules', '.bin', 'electron'),
-      electronArgv: ['-r', 'dotenv/config', __filename],
-      forceHardReset: true,
-      hardResetMethod: 'exit',
-    })
   }
   else {
     window.loadURL(`file://${__dirname}/index.html`)

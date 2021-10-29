@@ -4,6 +4,11 @@ import log from './log'
 
 let _isRendererIdle = false
 
+type Options = {
+  onEnter?: () => void
+  onExit?: () => void
+}
+
 /**
  * Indicates whether the renderer process is currently in idle mode.
  *
@@ -13,13 +18,13 @@ export function isRendererIdle() {
   return _isRendererIdle
 }
 
-export function initRendererIdleModeEvents(onEnterIdleMode?: () => void, onExitIdleMode?: () => void) {
+export function initIdler({ onEnter, onExit }: Options = {}) {
   ipcMain.on(IpcMainChannel.ENTER_IDLE_MODE, () => {
     log.info('Entering idle mode... OK')
 
     _isRendererIdle = true
 
-    onEnterIdleMode?.()
+    onEnter?.()
   })
 
   ipcMain.on(IpcMainChannel.EXIT_IDLE_MODE, () => {
@@ -28,6 +33,6 @@ export function initRendererIdleModeEvents(onEnterIdleMode?: () => void, onExitI
       _isRendererIdle = false
     }
 
-    onExitIdleMode?.()
+    onExit?.()
   })
 }

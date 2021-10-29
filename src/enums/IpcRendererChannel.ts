@@ -2,6 +2,7 @@
  * @file Enum of IPC channels and payloads to be handled on the renderer process.
  */
 
+import { ProgressInfo } from '../main/utils/autoUpdate'
 import UpdateStatus from './UpdateStatus'
 
 export type IpcRendererChannelPayload = {
@@ -13,11 +14,7 @@ export type IpcRendererChannelPayload = {
   DEBUG_MODE_CHANGED: boolean
   UPDATE_STATUS_CHANGED: {
     status: UpdateStatus
-    progress?: {
-      percent: number
-      total: number
-      bytesPerSecond: number
-    }
+    progress?: ProgressInfo
     error?: Error
   }
 }

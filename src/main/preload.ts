@@ -21,7 +21,7 @@ contextBridge.exposeInMainWorld('app', {
   open: (target: string, options?: open.Options) => open(target, options),
   enterIdleMode: () => ipcRenderer.send(IpcMainChannel.ENTER_IDLE_MODE),
   exitIdleMode: () => ipcRenderer.send(IpcMainChannel.EXIT_IDLE_MODE),
-  checkUpdates: () => ipcRenderer.send(IpcMainChannel.CHECK_UPDATES),
+  checkForUpdates: () => ipcRenderer.send(IpcMainChannel.CHECK_FOR_UPDATES),
   installUpdates: () => ipcRenderer.send(IpcMainChannel.INSTALL_UPDATES),
   quitApp: () => ipcRenderer.send(IpcMainChannel.QUIT_APP),
   reloadWindow: () => ipcRenderer.send(IpcMainChannel.RELOAD_WINDOW),

@@ -98,7 +98,7 @@ class Admin extends PureComponent<Props, State> {
           <span>{appStatus}</span>
         </StyledStatus>
         <StyledHeader>
-          <h1>{appInfo?.name ?? 'asdfsadfasdfasfjaksdfjdas;fjad;lsf;adlsjfks;a'}</h1>
+          <h1>{appInfo?.name ?? '???'}</h1>
           <aside>
             <span>{`v${appInfo?.version ?? '???'}`}</span>
             <span>{appInfo?.ip ?? '???.???.???.???'}</span>
@@ -107,8 +107,8 @@ class Admin extends PureComponent<Props, State> {
         <StyledSettings/>
         <StyledControls>
           <StyledControlButton className={classNames({ active: debugEnabled })} onClick={() => app?.toggleDebugMode()}>Debug Mode</StyledControlButton>
-          <StyledControlButton onClick={() => app?.checkUpdates()}>Check Updates</StyledControlButton>
-          <StyledControlButton onClick={() => app?.installUpdates()} disabled={!isUpdateReady}>Install updates</StyledControlButton>
+          <StyledControlButton onClick={() => app?.checkForUpdates()} disabled={!__APP_CONFIG__.autoUpdate}>Check Updates</StyledControlButton>
+          <StyledControlButton onClick={() => app?.installUpdates()} disabled={!__APP_CONFIG__.autoUpdate || !isUpdateReady}>Install updates</StyledControlButton>
           <StyledControlButton onClick={() => app?.reloadWindow()}>Reload Window</StyledControlButton>
           <StyledControlButton onClick={() => app?.quitApp()}>Quit App</StyledControlButton>
           <StyledControlButton onClick={() => this.deactivate()}>Close Panel</StyledControlButton>
@@ -167,7 +167,7 @@ class Admin extends PureComponent<Props, State> {
       log.info('Checking for updates... OK: Update is available')
       this.setState({ appStatus: 'Update is available' })
       break
-    case UpdateStatus.NOT_AVAILABLE:
+    case UpdateStatus.UNAVAILABLE:
       log.info('Checking for updates... OK: App is up-to-date')
       this.setState({ appStatus: 'App is up-to-date' })
       break
@@ -181,7 +181,7 @@ class Admin extends PureComponent<Props, State> {
       break
     case UpdateStatus.DOWNLOADING: {
       const toMB = (b: number) => ((b/(1024*1024)).toFixed(2))
-      const progress = data.progress ? ` (${Math.floor(data.progress.percent)}% of ${toMB(data.progress.total)}MB at ${toMB(data.progress.bytesPerSecond)}MB/s)` : ''
+      const progress = data.progress ? ` (${Math.floor(data.progress.percent)}% of ${toMB(data.progress.bytesTotal)}MB at ${toMB(data.progress.bytesPerSecond)}MB/s)` : ''
 
       this.setState({
         isUpdateReady: false,
@@ -256,18 +256,14 @@ const StyledStatus = styled.div`
   color: #fff;
   display: flex;
   flex-direction: row;
-  height: 50px;
   justify-content: center;
-  padding: 0 10px;
+  padding: 14px 10px;
 
   span {
     font-size: 12px;
     max-width: 100%;
-    overflow: hidden;
     text-align: left;
-    text-overflow: ellipsis;
     text-transform: uppercase;
-    white-space: nowrap;
   }
 `
 
