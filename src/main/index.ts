@@ -7,22 +7,39 @@ import ip from 'ip'
 import path from 'path'
 import appConf from '../../config/app.conf'
 import IpcMainChannel from '../enums/IpcMainChannel'
-import IpcRendererChannel, { IpcRendererChannelPayload } from '../enums/IpcRendererChannel'
+import IpcRendererChannel from '../enums/IpcRendererChannel'
 import log, { disableIpcLogging, disableRendererLogging, enableIpcLogging, enableRendererLogging, isRendererLoggingEnabled } from './utils/log'
 
 const isDev = process.env.NODE_ENV === 'development'
 
-let currentWindow: BrowserWindow | undefined
+let mainWindow: BrowserWindow | undefined
+
+app.whenReady().then(() => {
+  log.info('Starting main process... OK')
+
+  initWindow()
+  initIpcComm()
+
+  // On macOS it's common to re-create a window in the app when the dock icon is clicked and there
+  // are no other windows open.
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) initWindow()
+  })
+})
+
+// Quit when all windows are closed, except on macOS. There, it's common for applications and their
+// menu bar to stay active until the user quits explicitly with Cmd + Q.
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit()
+})
 
 /**
- * Creates a new Electron main window.
- *
- * @returns The window.
+ * Initializes the main window.
  *
  * @see https://electron.atom.io/docs/api/browser-window/
  */
-export default function createWindow(): BrowserWindow {
-  const mainWindow = new BrowserWindow({
+function initWindow() {
+  const window = new BrowserWindow({
     fullscreen: appConf.autoFullscreen,
     x: appConf.windowPosition.x,
     y: appConf.windowPosition.y,
@@ -36,8 +53,8 @@ export default function createWindow(): BrowserWindow {
   })
 
   if (isDev) {
-    mainWindow.loadURL(`http://localhost:${Number(process.env.PORT ?? 8080)}`)
-    mainWindow.webContents.openDevTools()
+    window.loadURL(`http://localhost:${Number(process.env.PORT ?? 8080)}`)
+    window.webContents.openDevTools()
 
     log.debug(`Debug environment detected, enabling auto reloading enabled for directory ${__dirname} and main module ${__filename}... OK`)
 
@@ -49,64 +66,55 @@ export default function createWindow(): BrowserWindow {
     })
   }
   else {
-    mainWindow.loadURL(`file://${__dirname}/index.html`)
+    window.loadURL(`file://${__dirname}/index.html`)
   }
 
   // Send initial IPC events when window is finished loading.
-  mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.send(IpcRendererChannel.APP_INFO_READY, {
-      name: app.name,
-      version: app.getVersion(),
-      ip: ip.address(),
-    })
-    mainWindow.webContents.send(IpcRendererChannel.DEBUG_MODE_CHANGED, isRendererLoggingEnabled())
-  })
+  window.webContents.on('did-finish-load', () => seedIpcComm())
+
+  // Garbage collect the window when it is closed.
+  window.on('closed', () => { mainWindow = undefined })
 
   log.info('Building main window... OK')
 
-  return mainWindow
+  mainWindow = window
 }
 
-app.whenReady().then(() => {
-  log.info('Starting main process... OK')
+/**
+ * Sends initial IPC events when the window is finished loading.
+ */
+function seedIpcComm() {
+  if (!mainWindow) return
 
-  currentWindow = createWindow()
-  currentWindow?.on('closed', () => { currentWindow = undefined })
+  mainWindow.webContents.send(IpcRendererChannel.DEBUG_MODE_CHANGED, isRendererLoggingEnabled())
 
+  mainWindow.webContents.send(IpcRendererChannel.APP_INFO_READY, {
+    name: app.name,
+    version: app.getVersion(),
+    ip: ip.address(),
+  })
+}
+
+/**
+ * Initializes IPC communication channels.
+ */
+function initIpcComm() {
   ipcMain.on(IpcMainChannel.TOGGLE_DEBUG_MODE, () => {
     if (isRendererLoggingEnabled()) {
       disableRendererLogging()
       disableIpcLogging()
-      const payload: IpcRendererChannelPayload['DEBUG_MODE_CHANGED'] = false
-      currentWindow?.webContents.send(IpcRendererChannel.DEBUG_MODE_CHANGED, payload)
-      currentWindow?.webContents.closeDevTools()
+      mainWindow?.webContents.send(IpcRendererChannel.DEBUG_MODE_CHANGED, false)
+      mainWindow?.webContents.closeDevTools()
     }
     else {
       enableRendererLogging()
       enableIpcLogging()
-      const payload: IpcRendererChannelPayload['DEBUG_MODE_CHANGED'] = true
-      currentWindow?.webContents.send(IpcRendererChannel.DEBUG_MODE_CHANGED, payload)
-      currentWindow?.webContents.openDevTools()
+      mainWindow?.webContents.send(IpcRendererChannel.DEBUG_MODE_CHANGED, true)
+      mainWindow?.webContents.openDevTools()
     }
   })
 
-  ipcMain.on(IpcMainChannel.RELOAD_WINDOW, () => currentWindow?.reload())
+  ipcMain.on(IpcMainChannel.RELOAD_WINDOW, () => mainWindow?.reload())
+
   ipcMain.on(IpcMainChannel.QUIT_APP, () => app.quit())
-
-  currentWindow?.webContents.send(IpcRendererChannel.DEBUG_MODE_CHANGED, isDev)
-
-  // On macOS it's common to re-create a window in the app when the dock icon is clicked and there
-  // are no other windows open.
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      currentWindow = createWindow()
-      currentWindow?.on('closed', () => { currentWindow = undefined })
-    }
-  })
-})
-
-// Quit when all windows are closed, except on macOS. There, it's common for applications and their
-// menu bar to stay active until the user quits explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit()
-})
+}
