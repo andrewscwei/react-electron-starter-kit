@@ -51,7 +51,6 @@ type State = {
   appInfo?: IpcRendererChannelPayload['APP_INFO_READY']
   appStatus: string
   debugEnabled: boolean
-  idleTimeout?: number
   isActive: boolean
   isUpdateReady: boolean
 }
@@ -67,7 +66,6 @@ class Admin extends PureComponent<Props, State> {
       appInfo: undefined,
       appStatus: 'WARNING: For devs only',
       debugEnabled: false,
-      idleTimeout: undefined,
       isActive: false,
       isUpdateReady: false,
     }
@@ -79,9 +77,6 @@ class Admin extends PureComponent<Props, State> {
     app?.ipcRenderer?.on(IpcRendererChannel.UPDATE_STATUS_CHANGED, this.onUpdateStatusChanged)
 
     document.addEventListener('pointerup', this.onWindowPointerUp)
-    document.addEventListener('keyup', this.onWindowKeyUp)
-
-    this.restartIdleTimeout()
   }
 
   componentWillUnmount() {
@@ -90,9 +85,7 @@ class Admin extends PureComponent<Props, State> {
     app?.ipcRenderer?.off(IpcRendererChannel.UPDATE_STATUS_CHANGED, this.onUpdateStatusChanged)
 
     document.removeEventListener('pointerup', this.onWindowPointerUp)
-    document.removeEventListener('keyup', this.onWindowKeyUp)
 
-    if (this.state.idleTimeout) clearTimeout(this.state.idleTimeout)
     if (this.state.activationTimeout) clearTimeout(this.state.activationTimeout)
   }
 
@@ -219,8 +212,6 @@ class Admin extends PureComponent<Props, State> {
    * @param event - The `PointerEvent`.
    */
   private onWindowPointerUp = ({ clientX: x, clientY: y }: PointerEvent) => {
-    this.restartIdleTimeout()
-
     if (x > 100 || y > 100) return this.cancelPendingActivation()
 
     this.setState({ activationCount: this.state.activationCount + 1 })
@@ -229,16 +220,6 @@ class Admin extends PureComponent<Props, State> {
     if (this.state.activationCount < ACTIVATION_MAX_TRIGGER_COUNT) return
 
     this.activate()
-  }
-
-  /**
-   * Method invoked when the window detects a key up event. Key up events help determine if the app
-   * is idle.
-   *
-   * @param event - The `KeyboardEvent`.
-   */
-  private onWindowKeyUp = (event: KeyboardEvent) => {
-    this.restartIdleTimeout()
   }
 
   /**
@@ -262,25 +243,6 @@ class Admin extends PureComponent<Props, State> {
     this.setState({
       activationTimeout: undefined,
       activationCount: 0,
-    })
-  }
-
-  /**
-   * Restarts the idle timeout.
-   */
-  private restartIdleTimeout() {
-    if (this.state.idleTimeout) clearTimeout(this.state.idleTimeout)
-
-    app?.exitIdleMode?.()
-
-    const timeout = window.setTimeout(() => {
-      app?.enterIdleMode?.()
-      if (this.state.idleTimeout) clearTimeout(this.state.idleTimeout)
-      this.setState({ idleTimeout: undefined })
-    }, __APP_CONFIG__.idleTimeout)
-
-    this.setState({
-      idleTimeout: timeout,
     })
   }
 }

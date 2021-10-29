@@ -5,12 +5,30 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import styled, { createGlobalStyle } from 'styled-components'
 import routesConf from '../routes.conf'
 import globalStyles from '../styles/global'
+import { deinitIdler, initIdler } from '../utils/idle'
 
 type Props = {
   route: RouteComponentProps
 }
 
-class App extends PureComponent<Props> {
+type State = {
+  isIdle: boolean
+}
+
+class App extends PureComponent<Props, State> {
+
+  state: State = {
+    isIdle: false,
+  }
+
+  componentDidMount() {
+    initIdler(() => this.setState({ isIdle: true} ), () => this.setState({ isIdle: false }))
+  }
+
+  componentWillUnmount() {
+    deinitIdler()
+  }
+
   render() {
     const { route } = this.props
 

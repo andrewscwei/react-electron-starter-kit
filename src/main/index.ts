@@ -8,6 +8,7 @@ import path from 'path'
 import appConf from '../../config/app.conf'
 import IpcMainChannel from '../enums/IpcMainChannel'
 import IpcRendererChannel from '../enums/IpcRendererChannel'
+import { initRendererIdleModeEvents } from './utils/idle'
 import log, { disableIpcLogging, disableRendererLogging, enableIpcLogging, enableRendererLogging, isRendererLoggingEnabled } from './utils/log'
 
 const isDev = process.env.NODE_ENV === 'development'
@@ -19,6 +20,7 @@ app.whenReady().then(() => {
 
   initWindow()
   initIpcComm()
+  initRendererIdleModeEvents()
 
   // On macOS it's common to re-create a window in the app when the dock icon is clicked and there
   // are no other windows open.
