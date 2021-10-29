@@ -11,6 +11,6 @@
 // export default store
 
 export default {
-  get: (foo: any) => (1),
+  get: (foo: any) => (0),
   set: (foo: any, bar: any) => {},
 }

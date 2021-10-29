@@ -16,7 +16,6 @@ import { buildDir, localesDir, rendererSrcDir as srcDir } from './utils/paths'
 const isDev = process.env.NODE_ENV === 'development'
 const locales = getLocalesFromDir(localesDir, appConf.locales[0], appConf.locales)
 const port = Number(process.env.PORT ?? 8080)
-const publicPath = '/'
 
 const config: Configuration = {
   devtool: isDev ? 'eval-source-map' : false,
@@ -47,7 +46,7 @@ const config: Configuration = {
           loader: 'file-loader',
           options: {
             limit: 8192,
-            name: 'assets/images/[name].[ext]',
+            name: 'images/[name].[ext]',
           },
         }],
       }, {
@@ -56,7 +55,7 @@ const config: Configuration = {
           loader: 'file-loader',
           options: {
             limit: 8192,
-            name: 'assets/media/[name].[ext]',
+            name: 'media/[name].[ext]',
           },
         }],
       }, {
@@ -65,7 +64,7 @@ const config: Configuration = {
           loader: 'file-loader',
           options: {
             limit: 8192,
-            name: 'assets/fonts/[name].[ext]',
+            name: 'fonts/[name].[ext]',
           },
         }],
       }],
@@ -88,7 +87,7 @@ const config: Configuration = {
     globalObject: 'this', // See https://github.com/webpack/webpack/issues/6642#issuecomment-371087342
     path: path.join(buildDir),
     sourceMapFilename: '[file].map',
-    publicPath,
+    publicPath: isDev ? '/' : './',
   },
   plugins: [
     new CopyPlugin({
@@ -136,7 +135,7 @@ const config: Configuration = {
       hot: true,
       port,
       static: {
-        publicPath,
+        publicPath: '/',
       },
     },
   } : {},

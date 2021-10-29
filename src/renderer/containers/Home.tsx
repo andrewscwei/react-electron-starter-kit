@@ -7,6 +7,7 @@ import Logo from '../components/Logo'
 import { AppState } from '../store'
 import { increment, reset } from '../store/counter'
 import { changeLocale, I18nState } from '../store/i18n'
+import app from '../utils/app'
 
 type StateProps = {
   count: number
@@ -15,9 +16,9 @@ type StateProps = {
 }
 
 type DispatchProps = {
+  changeLocale: typeof changeLocale
   incrementCount: typeof increment
   resetCount: typeof reset
-  changeLocale: typeof changeLocale
 }
 
 type Props = StateProps & DispatchProps & RouteComponentProps
@@ -33,7 +34,7 @@ class Home extends PureComponent<Props> {
       el.addEventListener('click', event => {
         event.preventDefault()
         const url = (event.target as HTMLElement)?.getAttribute('href')
-        // if (url) open(url)
+        if (url) app?.open?.(url)
       })
     })
   }
@@ -73,9 +74,9 @@ export default connect(
     ...state.i18n,
   }),
   (dispatch: Dispatch<Action>): DispatchProps => bindActionCreators({
+    changeLocale,
     incrementCount: increment,
     resetCount: reset,
-    changeLocale,
   }, dispatch),
 )(Home)
 
@@ -91,7 +92,6 @@ const StyledRoot = styled.div`
   height: 100%;
   justify-content: center;
   width: 100%;
-  background: black;
 
   nav {
     align-items: center;

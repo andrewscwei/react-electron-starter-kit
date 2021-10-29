@@ -6,14 +6,19 @@
  */
 
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
+import open from 'open'
 import IpcMainChannel from '../enums/IpcMainChannel'
 import log, { isRendererLoggingEnabled } from './utils/log'
 
-if (isRendererLoggingEnabled()) log.info(`Checking application dependencies... OK: node=${process.versions['node']}, electron=${process.versions['electron']}, chrome=${process.versions['chrome']}`)
+if (isRendererLoggingEnabled()) {
+  // eslint-disable-next-line no-console
+  for (const dependency of ['Node', 'Electron', 'Chrome']) console.log(`${dependency}:`, `v${process.versions[dependency.toLowerCase()]}`)
+}
 
 contextBridge.exposeInMainWorld('log', log.functions)
 
 contextBridge.exposeInMainWorld('app', {
+  open: (target: string, options?: open.Options) => open(target, options),
   enterIdleMode: () => ipcRenderer.send(IpcMainChannel.ENTER_IDLE_MODE),
   exitIdleMode: () => ipcRenderer.send(IpcMainChannel.EXIT_IDLE_MODE),
   checkUpdates: () => ipcRenderer.send(IpcMainChannel.CHECK_UPDATES),

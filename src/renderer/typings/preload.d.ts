@@ -1,10 +1,16 @@
+
 interface Window {
   /**
    * Shared logging function with the main process.
    */
-  log: import('electron-log').ElectronLog
+  log?: import('electron-log').ElectronLog
 
-  app: {
+  app?: {
+
+    /**
+     * Opens a URL, app or executable, as supported by the package `open`.
+     */
+    open: (target: string, options?: import('open').Options) => void
 
     /**
      * Instructs the main process to check for available updates.
@@ -41,7 +47,7 @@ interface Window {
      */
     quitApp: () => void
 
-    ipcRenderer: {
+    ipcRenderer?: {
       on: import('electron').IpcRenderer['on']
       off: import('electron').IpcRenderer['off']
       send: import('electron').IpcRenderer['send']

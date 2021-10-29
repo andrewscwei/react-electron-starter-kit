@@ -1,4 +1,4 @@
-import $$ElectronLogo from '!!raw-loader!../assets/images/electron-logo.svg'
+import $$ElectronLogo from '../assets/images/electron-logo.svg'
 import $$ReactLogo from '!!raw-loader!../assets/images/react-logo.svg'
 import React, { PureComponent } from 'react'
 import styled from 'styled-components'
@@ -14,14 +14,14 @@ export default class Logo extends PureComponent<Props> {
 
     return (
       <StyledRoot className={className}>
-        <StyledElectronLogo dangerouslySetInnerHTML={{ __html: $$ElectronLogo }}/>
+        <StyledElectronLogo src={$$ElectronLogo}/>
         <StyledReactLogo dangerouslySetInnerHTML={{ __html: $$ReactLogo }}/>
       </StyledRoot>
     )
   }
 }
 
-const StyledElectronLogo = styled.figure`
+const StyledElectronLogo = styled.img`
   animation: rotate-cw 5s linear infinite;
   transform-origin: center;
 
@@ -48,7 +48,7 @@ const StyledRoot = styled.div`
   flex-direction: row;
   justify-content: center;
 
-  & > figure {
+  & > * {
     height: 100%;
     margin: 0;
     padding: 0;

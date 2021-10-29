@@ -5,7 +5,7 @@ import * as theme from './theme'
 export default css`
   @font-face {
     font-family: 'RobotoMono';
-    src: url('/fonts/RobotoMono-Regular.ttf') format('truetype');
+    src: url('fonts/RobotoMono-Regular.ttf') format('truetype');
     font-style: normal;
     font-weight: 400;
   }

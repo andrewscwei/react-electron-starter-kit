@@ -74,9 +74,9 @@ class Admin extends PureComponent<Props, State> {
   }
 
   componentDidMount() {
-    app.ipcRenderer.on(IpcRendererChannel.UPDATE_STATUS_CHANGED, this.onUpdateStatusChanged)
-    app.ipcRenderer.on(IpcRendererChannel.APP_INFO_READY, this.onAppInfoReady)
-    app.ipcRenderer.on(IpcRendererChannel.DEBUG_MODE_CHANGED, this.onDebugModeChanged)
+    app?.ipcRenderer?.on(IpcRendererChannel.APP_INFO_READY, this.onAppInfoReady)
+    app?.ipcRenderer?.on(IpcRendererChannel.DEBUG_MODE_CHANGED, this.onDebugModeChanged)
+    app?.ipcRenderer?.on(IpcRendererChannel.UPDATE_STATUS_CHANGED, this.onUpdateStatusChanged)
 
     document.addEventListener('pointerup', this.onWindowPointerUp)
     document.addEventListener('keyup', this.onWindowKeyUp)
@@ -85,9 +85,9 @@ class Admin extends PureComponent<Props, State> {
   }
 
   componentWillUnmount() {
-    app.ipcRenderer.off(IpcRendererChannel.UPDATE_STATUS_CHANGED, this.onUpdateStatusChanged)
-    app.ipcRenderer.off(IpcRendererChannel.APP_INFO_READY, this.onAppInfoReady)
-    app.ipcRenderer.off(IpcRendererChannel.DEBUG_MODE_CHANGED, this.onDebugModeChanged)
+    app?.ipcRenderer?.off(IpcRendererChannel.APP_INFO_READY, this.onAppInfoReady)
+    app?.ipcRenderer?.off(IpcRendererChannel.DEBUG_MODE_CHANGED, this.onDebugModeChanged)
+    app?.ipcRenderer?.off(IpcRendererChannel.UPDATE_STATUS_CHANGED, this.onUpdateStatusChanged)
 
     document.removeEventListener('pointerup', this.onWindowPointerUp)
     document.removeEventListener('keyup', this.onWindowKeyUp)
@@ -113,11 +113,11 @@ class Admin extends PureComponent<Props, State> {
         </StyledHeader>
         <StyledSettings/>
         <StyledControls>
-          <StyledControlButton className={classNames({ active: debugEnabled })} onClick={() => app.toggleDebugMode()}>Debug Mode</StyledControlButton>
-          <StyledControlButton onClick={() => app.checkUpdates()}>Check Updates</StyledControlButton>
-          <StyledControlButton onClick={() => app.installUpdates()} disabled={!isUpdateReady}>Install updates</StyledControlButton>
-          <StyledControlButton onClick={() => app.reloadWindow()}>Reload Window</StyledControlButton>
-          <StyledControlButton onClick={() => app.quitApp()}>Quit App</StyledControlButton>
+          <StyledControlButton className={classNames({ active: debugEnabled })} onClick={() => app?.toggleDebugMode()}>Debug Mode</StyledControlButton>
+          <StyledControlButton onClick={() => app?.checkUpdates()}>Check Updates</StyledControlButton>
+          <StyledControlButton onClick={() => app?.installUpdates()} disabled={!isUpdateReady}>Install updates</StyledControlButton>
+          <StyledControlButton onClick={() => app?.reloadWindow()}>Reload Window</StyledControlButton>
+          <StyledControlButton onClick={() => app?.quitApp()}>Quit App</StyledControlButton>
           <StyledControlButton onClick={() => this.deactivate()}>Close Panel</StyledControlButton>
         </StyledControls>
       </StyledRoot>
@@ -271,10 +271,10 @@ class Admin extends PureComponent<Props, State> {
   private restartIdleTimeout() {
     if (this.state.idleTimeout) clearTimeout(this.state.idleTimeout)
 
-    app.exitIdleMode()
+    app?.exitIdleMode?.()
 
     const timeout = window.setTimeout(() => {
-      app.enterIdleMode()
+      app?.enterIdleMode?.()
       if (this.state.idleTimeout) clearTimeout(this.state.idleTimeout)
       this.setState({ idleTimeout: undefined })
     }, __APP_CONFIG__.idleTimeout)

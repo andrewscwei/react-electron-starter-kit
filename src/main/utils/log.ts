@@ -56,7 +56,7 @@ export function disableRendererLogging() {
  *
  * @returns `true` if enabled, `false` otherwise.
  */
- export function isRendererLoggingEnabled(): boolean {
+export function isRendererLoggingEnabled(): boolean {
   return _isRendererLoggingEnabled
 }
 
