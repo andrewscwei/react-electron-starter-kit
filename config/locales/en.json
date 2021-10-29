@@ -1,0 +1,7 @@
+{
+  "hello": "Hell<em>%{count0}</em>, w<em>%{count1}</em>rld!",
+  "description": "This project is built by <a href='https://github.com/andrewscwei/electron-react-builder'>electron-react-builder</a>",
+  "increment": "Increment",
+  "reset": "Reset",
+  "switch-lang": "日本語"
+}

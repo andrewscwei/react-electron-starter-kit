@@ -1,0 +1,7 @@
+{
+  "hello": "こ<em>%{count0}</em>にち<em>%{count1}</em>, 世界！",
+  "description": "このプロジェクトは<a href='https://github.com/andrewscwei/electron-react-builder'>electron-react-builder</a>によって構築されています",
+  "increment": "増加",
+  "reset": "リセット",
+  "switch-lang": "English"
+}
