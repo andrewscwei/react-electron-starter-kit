@@ -30,7 +30,7 @@ const winCodeSignCertificatePassword = process.env.WIN_CODE_SIGN_CERTIFICATE_PAS
 
 module.exports = {
   'packagerConfig': {
-    'appBundleId': 'mu.andr.reactelectronstarterkit'
+    'appBundleId': 'mu.andr.reactelectronstarterkit',
     'dir': 'build',
     'icon': path.join(cwd, 'res/icons/icon'),
     'name': 'React Electron Starter Kit',
