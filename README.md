@@ -36,28 +36,28 @@ See `scripts` in `package.json` for additional commands.
 When distributing an Electron app for macOS, you need to code-sign and notarize it in order for it to clear macOS security. To do so, you need to prepare the following:
 1. Enroll in the [Apple Developer Program](https://developer.apple.com/programs/)
 2. Make note of your team ID
-  1. Log in to [Member Center](https://developer.apple.com/membercenter/)
-  2. Go to **Membership**
-  3. You will see it under **Team ID**
+    1. Log in to [Member Center](https://developer.apple.com/membercenter/)
+    2. Go to **Membership**
+    3. You will see it under **Team ID**
 3. Create a Certificate Signing Request (CSR), which will be required for generating code-signing certificates in the next step:
-  1. On your Mac, open **Keychain Access** app
-  2. Go to **Keychain Access** > **Certificate Assitant** > **Request a Certificate From a Certificate Authority**
-  3. A dialog will appear, enter the email address registered with your Apple Developer Program account under **User Email Address**
-  4. Under **Request is**, select **Saved to disk**
-  5. Leave everything else blank
-  6. Click **Continue**
-  7. Save the `.certSigningRequest` file somewhere
+    1. On your Mac, open **Keychain Access** app
+    2. Go to **Keychain Access** > **Certificate Assitant** > **Request a Certificate From a Certificate Authority**
+    3. A dialog will appear, enter the email address registered with your Apple Developer Program account under **User Email Address**
+    4. Under **Request is**, select **Saved to disk**
+    5. Leave everything else blank
+    6. Click **Continue**
+    7. Save the `.certSigningRequest` file somewhere
 3. Generate code-signing certificates:
-  1. Log in to [Member Center](https://developer.apple.com/membercenter/)
-  2. Go to **Certificates, Identifiers & Profiles**
-  3. Under **Certificates**, click the plus button
-  4. Select **Developer ID Application** (`Developer ID Application: * (*)`), then repeat (in step 7) for **Developer ID Installer** (`Developer ID Installer: * (*)`) for distribution outside the Mac App Store; or select **Mac App Distribution** (`3rd Party Mac Developer Application: * (*)`), then repeat (in step 7) for **Mac Installer Distribution** (`3rd Party Mac Developer Installer: * (*)`) for distribution inside the Mac App Store
-  5. Upon clicking **Continue**, you will be prompted to upload a CSR file, so select the `.certSigningRequest` file you just created
-  6. Once the certificate is created, download it and open it with the **Keychain Access** app on your Mac
-  7. Repeat for the second certificate
-  8. When you have both certificates in **Keychain Access**, select both, then right click and export both items to a `.p12` file
-  9. Provide a secure password, make note of this password
-  10. Encode the `.p12` file to base-64 string: `base64 -i Certificates.p12`
+    1. Log in to [Member Center](https://developer.apple.com/membercenter/)
+    2. Go to **Certificates, Identifiers & Profiles**
+    3. Under **Certificates**, click the plus button
+    4. Select **Developer ID Application** (`Developer ID Application: * (*)`), then repeat (in step 7) for **Developer ID Installer** (`Developer ID Installer: * (*)`) for distribution outside the Mac App Store; or select **Mac App Distribution** (`3rd Party Mac Developer Application: * (*)`), then repeat (in step 7) for **Mac Installer Distribution** (`3rd Party Mac Developer Installer: * (*)`) for distribution inside the Mac App Store
+    5. Upon clicking **Continue**, you will be prompted to upload a CSR file, so select the `.certSigningRequest` file you just created
+    6. Once the certificate is created, download it and open it with the **Keychain Access** app on your Mac
+    7. Repeat for the second certificate
+    8. When you have both certificates in **Keychain Access**, select both, then right click and export both items to a `.p12` file
+    9. Provide a secure password, make note of this password
+    10. Encode the `.p12` file to base-64 string: `base64 -i Certificates.p12`
 4. Prepare the following environment variables for later use in the CI environment:
     ```sh
     # Apple ID (email) with a registered developer account
