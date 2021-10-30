@@ -16,3 +16,8 @@ jobs:
       run: npm install
     - name: Build
       run: npm run dist:mac
+    - name: Persist distribution
+      uses: actions/upload-artifact@v1
+      with:
+        name: out
+        path: out/
