@@ -33,7 +33,6 @@ pids
 public/
 package/
 dist/
-out/
 build/
 upload/
 uploads/

@@ -9,20 +9,13 @@
       "name": "@electron-forge/maker-squirrel",
       "platforms": ["win32"],
       "config": {
-        "name": "react_electron_starter_kit"
       }
     },
     {
       "name": "@electron-forge/maker-zip",
-      "platforms": ["darwin", "linux"]
-    },
-    {
-      "name": "@electron-forge/maker-deb",
-      "config": {}
-    },
-    {
-      "name": "@electron-forge/maker-rpm",
-      "config": {}
+      "platforms": ["darwin", "linux"],
+      "config": {
+      }
     }
   ]
 }

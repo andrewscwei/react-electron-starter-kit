@@ -5,8 +5,11 @@ on:
     tags-ignore: ['v[0-9]+.[0-9]+.[0-9]+']
 
 jobs:
-  build_on_mac:
-    runs-on: macos-latest
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@master
@@ -15,20 +18,9 @@ jobs:
     - name: Install Node modules
       run: npm install
     - name: Build
-      run: npm run dist:mac
+      run: npm run dist
     - name: Persist distribution
       uses: actions/upload-artifact@v1
       with:
-        name: out
-        path: out/
-  build_on_win:
-    runs-on: windows-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@master
-      with:
-        node-version: 16.3.0
-    - name: Install Node modules
-      run: npm install
-    - name: Build
-      run: npm run dist:win
+        name: dist
+        path: dist/
