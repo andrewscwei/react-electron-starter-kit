@@ -28,13 +28,17 @@ const winCodeSignCertificateFile = process.env.WIN_CODE_SIGN_CERTIFICATE_FILE
  */
 const winCodeSignCertificatePassword = process.env.WIN_CODE_SIGN_CERTIFICATE_PASSWORD
 
+const shouldCodeSignMac = macCodeSignIdentity && macCodeSignAppleId && macCodeSignAppleIdPassword
+
+const shouldCodeSignWin = winCodeSignCertificateFile && winCodeSignCertificatePassword
+
 module.exports = {
   'packagerConfig': {
     'appBundleId': 'mu.andr.reactelectronstarterkit',
     'dir': 'build',
     'icon': path.join(cwd, 'res/icons/icon'),
     'name': 'React Electron Starter Kit',
-    ...(macCodeSignIdentity && macCodeSignAppleId && macCodeSignAppleIdPassword) ? {
+    ...shouldCodeSignMac ? {
       'osxSign': {
         'identity': macCodeSignIdentity,
         'hardened-runtime': true,
@@ -56,7 +60,7 @@ module.exports = {
     'name': '@electron-forge/maker-squirrel',
     'platforms': ['win32'],
     'config': {
-      ...(winCodeSignCertificateFile && winCodeSignCertificatePassword) ? {
+      ...shouldCodeSignWin ? {
         'certificateFile': winCodeSignCertificateFile,
         'certificatePassword': winCodeSignCertificatePassword,
       } : {},

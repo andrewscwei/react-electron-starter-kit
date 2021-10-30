@@ -17,26 +17,8 @@ jobs:
         node-version: 16.3.0
     - name: Install Node modules
       run: npm install
-    - name: Install Mac Certificates
-      if: matrix.os == 'macos-latest'
-      run: .github/workflows/install_mac_certs.sh
-      env:
-        CERTIFICATE_ENCODED: ${{ secrets.MAC_CODE_SIGN_CERTIFICATE }}
-        CERTIFICATE_PASSWORD: ${{ secrets.MAC_CODE_SIGN_CERTIFICATE_PASSWORD }}
-    - name: Install Windows Certificates
-      if: matrix.os == 'windows-latest'
-      id: install_win_certificate
-      run: .github/workflows/install_win_certs.sh
-      env:
-        CERTIFICATE_ENCODED: ${{ secrets.WIN_CODE_SIGN_CERTIFICATE }}
     - name: Build
       run: npm run make
-      env:
-        MAC_CODE_SIGN_APPLE_ID: ${{ secrets.MAC_CODE_SIGN_APPLE_ID }}
-        MAC_CODE_SIGN_APPLE_ID_PASSWORD: ${{ secrets.MAC_CODE_SIGN_APPLE_ID_PASSWORD }}
-        MAC_CODE_SIGN_IDENTITY: ${{ secrets.MAC_CODE_SIGN_IDENTITY }}
-        WIN_CODE_SIGN_CERTIFICATE_FILE: ${{ steps.install_win_certificate.outputs.certificate-file }}
-        WIN_CODE_SIGN_CERTIFICATE_PASSWORD: ${{ secrets.WIN_CODE_SIGN_CERTIFICATE_PASSWORD }}
     - name: Persist distribution
       uses: actions/upload-artifact@v1
       with:
