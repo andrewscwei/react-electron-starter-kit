@@ -27,7 +27,6 @@ module.exports = {
       'osxSign': {
         'identity': macCodeSignIdentity,
         'hardened-runtime': true,
-        'gatekeeper-assess': false,
         'entitlements': path.join(cwd, 'res/entitlements.plist'),
         'entitlements-inherit': path.join(cwd, 'res/entitlements.plist'),
         'signature-flags': 'library',
