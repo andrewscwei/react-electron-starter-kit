@@ -1,4 +1,3 @@
-
 interface Window {
   /**
    * Shared logging function with the main process.

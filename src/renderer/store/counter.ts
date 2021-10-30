@@ -3,7 +3,6 @@
  */
 
 import { Action, Dispatch } from 'redux'
-import cache from '../utils/cache'
 import log from '../utils/log'
 
 export type CounterState = {
@@ -20,7 +19,7 @@ export interface CounterAction extends Action<CounterActionType> {
 }
 
 const initialState: CounterState = {
-  count: (cache.get('count') as number) ?? 0,
+  count: 0,
 }
 
 export function increment() {
@@ -48,11 +47,9 @@ export default function reducer(state = initialState, action: CounterAction): Co
   switch (action.type) {
   case CounterActionType.CHANGED: {
     const t = state.count + (action.change ?? 0)
-    cache.set('count', t)
     return { count: t }
   }
   case CounterActionType.RESET:
-    cache.set('count', 0)
     return { count: 0 }
   default:
     return state

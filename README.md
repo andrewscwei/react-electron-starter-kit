@@ -2,7 +2,7 @@
 
 This is an **experimental** starter kit for a React Electron app.
 
-# Features
+## Features
 
 1. [`electron-reload`](https://www.npmjs.com/package/electron-reload) for the main process (in dev)
 2. HMR for the renderer process (in dev)
@@ -14,7 +14,7 @@ This is an **experimental** starter kit for a React Electron app.
 8. [React Transition Group](http://reactcommunity.org/react-transition-group/)
 9. [ESLint](https://eslint.org/) and [StyleLint](https://stylelint.io/) config
 
-# Usage
+## Usage
 
 ```sh
 # Install dependencies
@@ -22,16 +22,56 @@ $ npm install
 
 # Run in dev
 $ npm run dev
-
-# Build app for host platform
-$ npm run make
 ```
 
 See `scripts` in `package.json` for additional commands.
 
-# Code Signing
+## Building For Distribution
 
-## macOS
+Note that you can only build for the same host platform you are currently on. It is best to utilize the included GitHub actions script to build for multiple platforms during CI/CD.
+
+```sh
+$ npm run make
+```
+
+## Publishing
+
+To publish a release, simply run:
+
+```sh
+$ npm run publish
+```
+
+You can configure where the release should be published (defaults to GitHub) in `/config/forge.conf.js`.
+
+### Making Private GitHub Releases Available Publicly
+
+If you are hosting the releases in a private GitHub repo, you will need a dedicated server for fetching and redistributing the releases publicly. You can use a [Nuts](https://nuts.gitbook.com/) server to stage these releases. Click the button below to automatically create one on Heroku.
+
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/GitbookIO/nuts/tree/master)
+
+To set up Nuts:
+
+1. Provide an app name, i.e. `<repo_name>-nuts`
+2. Select your region, i.e. `US`
+3. Provide the GitHub repo of your project in the format `<user>/<repo_name>`
+4. Provide GitHub access token, either look for an existing one or [create your own](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
+5. Provide API username and password—these can be anything as long as you remember them, they are only used if you need to access the API of the Nuts server
+6. Select **Deploy app** and make note of your Nuts server's URL, i.e. `https://<repo_name>-nuts.herokuapp.com`
+
+Next, set up a GitHub webhook for the private releases repo so that whenever a release is published, the Nuts server is notified and will pull the latest release:
+
+1. Go to project settings in GitHub > **Webhooks** > **Add webhook**
+2. Set **Payload URL** to `<nuts_server_url>/refresh`
+3. Select `application/json` for **Content type**
+4. Set **Secret** to `secret`
+5. Select **Let me select individual events.** and only check **Release**
+
+Finally, assign the Nuts server URL to the `autoUpdateFeedUrl` field in `/config/app.conf.ts`, i.e. `<nuts_server_url>/download/latest`.
+
+## Code Signing
+
+### macOS
 
 > For more details see https://www.electronjs.org/docs/latest/tutorial/code-signing and https://github.com/electron/electron-osx-sign/wiki/1.-Getting-Started#certificates
 
@@ -80,7 +120,7 @@ When distributing an Electron app for macOS, you need to code-sign and notarize 
     MAC_CODE_SIGN_CERTIFICATE_PASSWORD
     ```
 
-## Windows
+### Windows
 
 > For more details see https://www.electronjs.org/docs/latest/tutorial/code-signing
 
