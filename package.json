@@ -1,13 +1,13 @@
 {
   "version": "0.1.0",
   "name": "react-electron-starter-kit",
-  "description": "A starter kit for Electron/React apps",
+  "description": "Experimental React Electron app starter kit",
   "main": "./build/main.js",
   "author": "Andrew Wei <andrewscwei@gmail.com>",
   "repository": "https://github.com/andrewscwei/react-electron-starter-kit",
   "license": "MIT",
   "config": {
-    "forge": "./config/forge.conf.json"
+    "forge": "./config/forge.conf.js"
   },
   "scripts": {
     "start": "electron build/main.js",

@@ -17,8 +17,17 @@ jobs:
         node-version: 16.3.0
     - name: Install Node modules
       run: npm install
+    - name: Prepare Mac Certificates
+      run: .github/workflows/prepare_mac_certs.sh
+      env:
+        CERTIFICATE_ENCODED: ${{ secrets.MAC_CODE_SIGN_CERTIFICATE }}
+        CERTIFICATE_PASSWORD: ${{ secrets.MAC_CODE_SIGN_CERTIFICATE_PASSWORD }}
     - name: Build
       run: npm run make
+      env:
+        MAC_CODE_SIGN_APPLE_ID: ${{ secrets.MAC_CODE_SIGN_APPLE_ID }}
+        MAC_CODE_SIGN_APPLE_ID_PASSWORD: ${{ secrets.MAC_CODE_SIGN_APPLE_ID_PASSWORD }}
+        MAC_CODE_SIGN_IDENTITY: ${{ secrets.MAC_CODE_SIGN_IDENTITY }}
     - name: Persist distribution
       uses: actions/upload-artifact@v1
       with:
