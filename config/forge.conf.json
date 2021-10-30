@@ -17,5 +17,16 @@
       "config": {
       }
     }
-  ]
+  ],
+  "publishers": [{
+    "name": "@electron-forge/publisher-github",
+    "config": {
+      "draft": false,
+      "prerelease": true,
+      "repository": {
+        "name": "react-electron-starter-kit",
+        "owner": "andrewscwei"
+      }
+    }
+  }]
 }

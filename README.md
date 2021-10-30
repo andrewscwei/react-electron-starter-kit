@@ -1,4 +1,4 @@
-# React Electron Starter Kit
+# React Electron Starter Kit [![CI](https://github.com/andrewscwei/react-electron-starter-kit/workflows/CI/badge.svg)](https://github.com/andrewscwei/react-electron-starter-kit/actions?query=workflow%3ACI)
 
 This is an **experimental** starter kit for a React Electron app.
 
@@ -22,6 +22,9 @@ $ npm install
 
 # Run in dev
 $ npm run dev
+
+# Build app for host platform
+$ npm run make
 ```
 
 See `scripts` in `package.json` for additional commands.

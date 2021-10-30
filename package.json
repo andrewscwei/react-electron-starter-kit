@@ -7,20 +7,21 @@
   "repository": "https://github.com/andrewscwei/react-electron-starter-kit",
   "license": "MIT",
   "config": {
-    "forge": "./config/dist.conf.json"
+    "forge": "./config/forge.conf.json"
   },
   "scripts": {
     "start": "electron build/main.js",
-    "clean": "npm run clean:build && npm run clean:dist",
+    "clean": "npm run clean:build && npm run clean:make",
     "clean:build": "rimraf build",
-    "clean:dist": "rimraf dist",
+    "clean:make": "rimraf out",
     "build": "cross-env-shell NODE_ENV=production \"npm run clean:build && npm run build:main && npm run build:renderer\"",
     "build:main": "webpack --config config/build.main.conf.ts",
     "build:renderer": "webpack --config config/build.renderer.conf.ts",
     "dev": "npm run clean:build && concurrently \"npm run dev:main\" \"npm run dev:renderer\"",
     "dev:main": "cross-env NODE_ENV=development concurrently \"npm run build:main -- --watch\" \"wait-on build/main.js build/preload.js http://localhost:${PORT:-8080} && electron -r dotenv/config build/main.js\"",
     "dev:renderer": "cross-env NODE_ENV=development webpack-cli serve --mode development --config config/build.renderer.conf.ts",
-    "dist": "npm run build && npm run clean:dist && electron-forge make && mv out dist",
+    "make": "npm run build && npm run clean:make && electron-forge make",
+    "publish": "npm run build && npm run clean:make && electron-forge publish",
     "lint": "npm run lint:ts && npm run lint:css",
     "lint:fix": "npm run lint:ts:fix && npm run lint:css:fix",
     "lint:ts": "eslint --ext .ts --ext .tsx config src",
@@ -40,6 +41,7 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.61",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.61",
     "@electron-forge/maker-zip": "^6.0.0-beta.61",
+    "@electron-forge/publisher-github": "^6.0.0-beta.61",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.1",
     "@stylelint/postcss-css-in-js": "^0.37.2",
     "@types/copy-webpack-plugin": "^8.0.1",
