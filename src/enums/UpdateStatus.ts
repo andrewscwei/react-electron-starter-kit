@@ -3,7 +3,6 @@ enum UpdateStatus {
   CHECKING,
   AVAILABLE,
   UNAVAILABLE,
-  DOWNLOADING,
   DOWNLOADED,
   ERROR,
 }

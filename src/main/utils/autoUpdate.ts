@@ -1,5 +1,4 @@
-import { BrowserWindow, ipcMain } from 'electron'
-import { autoUpdater } from 'electron-updater'
+import { autoUpdater, BrowserWindow, ipcMain } from 'electron'
 import appConf from '../../../config/app.conf'
 import IpcMainChannel from '../../enums/IpcMainChannel'
 import IpcRendererChannel from '../../enums/IpcRendererChannel'
@@ -24,13 +23,6 @@ type Options = {
   onUnavailable?: () => void
 
   /**
-   * Handler invoked when downloading an update.
-   *
-   * @param progress - A type that describes the progress of the download.
-   */
-  onDownloading?: (progress: ProgressInfo) => void
-
-  /**
    * Handler invoked when an update is successfully downloaded.
    */
   onDownloaded?: () => void
@@ -43,35 +35,23 @@ type Options = {
   onError?: (error: Error) => void
 }
 
-export type ProgressInfo = {
-
-  /**
-   * The transfer speed in terms of bytes per second.
-   */
-  bytesPerSecond: number
-
-  /**
-   * Total number of bytes of the update.
-   */
-  bytesTotal: number
-
-  /**
-   * Number of bytes transferred so far.
-   */
-  bytesTransferred: number
-
-  /**
-   * Decimal percentage completed (number between 0 - 1, inclusive).
-   */
-  percent: number
-}
-
 const isDev = process.env.NODE_ENV === 'development'
 
-// Indicates whether the app has a new update. This is used by the autoUpdater.
+const feedUrl = appConf.autoUpdateFeedUrl
+
+/**
+ * Indicates if the auto updater is already checking for updates.
+ */
+let isChecking = false
+
+/**
+ * Indicates whether the app has a new update. This is used by the autoUpdater.
+ */
 let _hasUpdate = false
 
-// Instance of the interval used for checking updates repeatedly.
+/**
+ * Instance of the interval used for checking updates repeatedly.
+ */
 let updateTimer: NodeJS.Timer | undefined
 
 /**
@@ -91,7 +71,7 @@ function checkForUpdates(window?: BrowserWindow) {
     window?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.DOWNLOADED })
     clearUpdateTimer()
   }
-  else {
+  else if (!isChecking) {
     autoUpdater.checkForUpdates()
   }
 }
@@ -109,6 +89,8 @@ export function hasUpdate() {
  * Stops checking for updates periodically.
  */
 export function stopPeriodicUpdateCheck() {
+  if (!feedUrl) return
+
   log.info('Stopping periodic update check... OK')
   clearUpdateTimer()
 }
@@ -117,7 +99,7 @@ export function stopPeriodicUpdateCheck() {
  * Checks for updates periodically, as defined by `checkForUpdatesInterval` property in app config file.
  */
 export function startPeriodicUpdateCheck() {
-  if (isDev || appConf.checkForUpdatesInterval <= 0) return clearInterval()
+  if (isDev || appConf.checkForUpdatesInterval <= 0 || !feedUrl) return clearInterval()
 
   log.info('Starting periodic update check... OK')
 
@@ -139,46 +121,44 @@ export function quitAndInstallUpdate() {
  *
  * @param options - @see Options
  */
-export function initAutoUpdater({ onError, onChecking, onAvailable, onUnavailable, onDownloading, onDownloaded }: Options = {}) {
+export function initAutoUpdater({ onError, onChecking, onAvailable, onUnavailable, onDownloaded }: Options = {}) {
+  if (!feedUrl) return
+
+  autoUpdater.setFeedURL({
+    url: feedUrl,
+  })
+
   autoUpdater.on('error', (err: Error) => {
     log.error(`Checking for updates... ERR: ${err}`)
+    isChecking = false
     onError?.(err)
   })
 
   autoUpdater.on('checking-for-update', () => {
     log.info('Checking for updates...')
+    isChecking = true
     onChecking?.()
   })
 
-  autoUpdater.on('update-available', (info: any) => {
-    log.info(`Checking for updates... OK: ${info}`)
+  autoUpdater.on('update-available', () => {
+    log.info(`Checking for updates... OK: Began downloading update`)
+    isChecking = false
+    clearUpdateTimer()
     onAvailable?.()
   })
 
-  autoUpdater.on('update-not-available', (info: any) => {
-    log.info(`Checking for updates... SKIP: ${info}`)
+  autoUpdater.on('update-not-available', () => {
+    log.info(`Checking for updates... SKIP`)
+    isChecking = false
     onUnavailable?.()
   })
 
-  autoUpdater.on('download-progress', (info: any) => {
-    const mappedProgressInfo: ProgressInfo = {
-      bytesPerSecond: info.bytesPerSecond ?? NaN,
-      bytesTransferred: info.transferred ?? NaN,
-      bytesTotal: info.bytesTotal ?? NaN,
-      percent: info.percent ?? NaN,
-    }
-
-    log.info('Downloading update...', mappedProgressInfo)
-
-    clearUpdateTimer()
-
-    onDownloading?.(mappedProgressInfo)
-  })
-
-  autoUpdater.on('update-downloaded', () => {
-    log.info('Downloading update... OK')
+  autoUpdater.on('update-downloaded', (event: Electron.Event, releaseNotes: string, releaseName: string, releaseDate: Date, updateUrl: string) => {
+    log.info(`Downloading update... OK: name=${releaseName}, date=${releaseDate}`)
 
     _hasUpdate = true
+
+    clearUpdateTimer()
 
     onDownloaded?.()
   })

@@ -25,38 +25,31 @@ app.whenReady().then(() => {
 
   if (isDev) require('./utils/dev').initDevEnvironment()
 
-  if (appConf.autoUpdate) {
-    initAutoUpdater({
-      onError: error => {
-        mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.ERROR, error })
-      },
-      onChecking: () => {
-        mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.CHECKING })
-      },
-      onAvailable: () => {
-        mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.AVAILABLE })
-      },
-      onUnavailable: () => {
-        mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.UNAVAILABLE })
-      },
-      onDownloading: progress => {
-        mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.DOWNLOADING, progress })
-      },
-      onDownloaded: () => {
-        if (isRendererIdle()) {
-          quitAndInstallUpdate()
-        }
-        else {
-          mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.DOWNLOADED })
-        }
-      },
-    })
-  }
+  initAutoUpdater({
+    onError: error => {
+      mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.ERROR, error })
+    },
+    onChecking: () => {
+      mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.CHECKING })
+    },
+    onAvailable: () => {
+      mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.AVAILABLE })
+    },
+    onUnavailable: () => {
+      mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.UNAVAILABLE })
+    },
+    onDownloaded: () => {
+      if (isRendererIdle()) {
+        quitAndInstallUpdate()
+      }
+      else {
+        mainWindow?.webContents.send(IpcRendererChannel.UPDATE_STATUS_CHANGED, { status: UpdateStatus.DOWNLOADED })
+      }
+    },
+  })
 
   initIdler({
     onEnter: () => {
-      if (!appConf.autoUpdate) return
-
       if (hasUpdate()) {
         quitAndInstallUpdate()
       }
@@ -65,8 +58,6 @@ app.whenReady().then(() => {
       }
     },
     onExit: () => {
-      if (!appConf.autoUpdate) return
-
       stopPeriodicUpdateCheck()
     },
   })

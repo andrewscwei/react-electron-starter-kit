@@ -164,8 +164,8 @@ class Admin extends PureComponent<Props, State> {
   private onUpdateStatusChanged = (event: IpcRendererEvent, data: IpcRendererChannelPayload['UPDATE_STATUS_CHANGED']) => {
     switch (data.status) {
     case UpdateStatus.AVAILABLE:
-      log.info('Checking for updates... OK: Update is available')
-      this.setState({ appStatus: 'Update is available' })
+      log.info('Checking for updates... OK: Update is available, downloading...')
+      this.setState({ appStatus: 'Downloading available update...' })
       break
     case UpdateStatus.UNAVAILABLE:
       log.info('Checking for updates... OK: App is up-to-date')
@@ -179,18 +179,6 @@ class Admin extends PureComponent<Props, State> {
       log.error(`Checking for updates... ERR: ${data.error}`)
       this.setState({ appStatus: `${data.error}` })
       break
-    case UpdateStatus.DOWNLOADING: {
-      const toMB = (b: number) => ((b/(1024*1024)).toFixed(2))
-      const progress = data.progress ? ` (${Math.floor(data.progress.percent)}% of ${toMB(data.progress.bytesTotal)}MB at ${toMB(data.progress.bytesPerSecond)}MB/s)` : ''
-
-      this.setState({
-        isUpdateReady: false,
-        appStatus: `Downloading... ${progress}`,
-      })
-
-      log.info(`Checking for updates... OK: Downloading ${progress}`)
-      break
-    }
     case UpdateStatus.DOWNLOADED:
       log.info('Checking for updates... OK: Successfully downloaded update')
 

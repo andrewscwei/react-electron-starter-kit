@@ -14,9 +14,10 @@ export default {
   checkForUpdatesInterval: 60 * 1000,
 
   /**
-   * Specifies if auto updater should be enabled.
+   * Specifies the feed URL of the auto updater. If `undefined`, auto updater will not be
+   * initialized.
    */
-  autoUpdate: false,
+  autoUpdateFeedUrl: process.env.AUTO_UPDATE_FEED_URL,
 
   /**
    * Time it takes for the app to be marked as idle so auto update can kick in, in milliseconds.
