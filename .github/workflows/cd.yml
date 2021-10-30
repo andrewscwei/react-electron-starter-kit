@@ -23,6 +23,12 @@ jobs:
       env:
         CERTIFICATE_ENCODED: ${{ secrets.MAC_CODE_SIGN_CERTIFICATE }}
         CERTIFICATE_PASSWORD: ${{ secrets.MAC_CODE_SIGN_CERTIFICATE_PASSWORD }}
+    - name: Install Windows Certificates
+      if: matrix.os == 'windows-latest'
+      id: install_win_certificate
+      run: .github/workflows/install_win_certs.sh
+      env:
+        CERTIFICATE_ENCODED: ${{ secrets.WIN_CODE_SIGN_CERTIFICATE }}
     - name: Publish
       run: npm run publish
       env:
@@ -30,3 +36,10 @@ jobs:
         MAC_CODE_SIGN_APPLE_ID: ${{ secrets.MAC_CODE_SIGN_APPLE_ID }}
         MAC_CODE_SIGN_APPLE_ID_PASSWORD: ${{ secrets.MAC_CODE_SIGN_APPLE_ID_PASSWORD }}
         MAC_CODE_SIGN_IDENTITY: ${{ secrets.MAC_CODE_SIGN_IDENTITY }}
+        WIN_CODE_SIGN_CERTIFICATE_FILE: ${{ steps.install_win_certificate.outputs.certificate-file }}
+        WIN_CODE_SIGN_CERTIFICATE_PASSWORD: ${{ secrets.WIN_CODE_SIGN_CERTIFICATE_PASSWORD }}
+    - name: Persist distribution
+      uses: actions/upload-artifact@v1
+      with:
+        name: package-${{ matrix.os }}
+        path: out/make/

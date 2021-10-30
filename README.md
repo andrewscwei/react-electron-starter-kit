@@ -60,8 +60,8 @@ When distributing an Electron app for macOS, you need to code-sign and notarize 
     6. Once the certificate is created, download it and open it with the **Keychain Access** app on your Mac
     7. When you have both certificates in **Keychain Access**, select both, then right click and export both items to a `.p12` file
     8. Provide a secure password, make note of this password
-    9. Encode the `.p12` file to base-64 string: `base64 -i Certificates.p12`
-4. Prepare the following environment variables for later use in the CI environment:
+    9. Encode the `.p12` file to base-64 string: `base64 -i certificate.p12`
+4. Prepare the following environment variables for later use (i.e. in the CI environment):
     ```sh
     # Apple ID (email) with a registered developer account
     MAC_CODE_SIGN_APPLE_ID
@@ -78,6 +78,23 @@ When distributing an Electron app for macOS, you need to code-sign and notarize 
 
     # The password provided while exporting the .p12 file
     MAC_CODE_SIGN_CERTIFICATE_PASSWORD
+    ```
+
+## Windows
+
+> For more details see https://www.electronjs.org/docs/latest/tutorial/code-signing
+
+Code signing for Windows involves acquiring a code signing certificate from a 3rd party reseller, such as [DigiCert](https://www.digicert.com/).
+1. Obtain the certificate file and ensure that it is in `.pfx` format
+2. Provide a secure password to unlock the `.pfx` file
+3. Encode the `.pfx` file to a base-64 string: `base64 -i certificate.pfx`
+4. Provide the following environment variables for later use (i.e. in the CI environment):
+    ```sh
+    # The base-64 encoded string of the .pfx file
+    WIN_CODE_SIGN_CERTIFICATE
+
+    # The password provided while exporting the .pfx file
+    WIN_CODE_SIGN_CERTIFICATE_PASSWORD
     ```
 
 ## Production Logging

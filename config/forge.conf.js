@@ -18,8 +18,19 @@ const macCodeSignAppleId = process.env.MAC_CODE_SIGN_APPLE_ID
  */
 const macCodeSignAppleIdPassword = process.env.MAC_CODE_SIGN_APPLE_ID_PASSWORD
 
+/**
+ * Absolute path to the Windows code sign certificate file (.pfx).
+ */
+const winCodeSignCertificateFile = process.env.WIN_CODE_SIGN_CERTIFICATE_FILE
+
+/**
+ * Password to unlock the Windows code sign certificate file.
+ */
+const winCodeSignCertificatePassword = process.env.WIN_CODE_SIGN_CERTIFICATE_PASSWORD
+
 module.exports = {
   'packagerConfig': {
+    'appBundleId': 'mu.andr.reactelectronstarterkit'
     'dir': 'build',
     'icon': path.join(cwd, 'res/icons/icon'),
     'name': 'React Electron Starter Kit',
@@ -44,7 +55,12 @@ module.exports = {
   }, {
     'name': '@electron-forge/maker-squirrel',
     'platforms': ['win32'],
-    'config': {}
+    'config': {
+      ...(winCodeSignCertificateFile && winCodeSignCertificatePassword) ? {
+        'certificateFile': winCodeSignCertificateFile,
+        'certificatePassword': winCodeSignCertificatePassword,
+      } : {},
+    }
   }],
   'publishers': [{
     'name': '@electron-forge/publisher-github',
