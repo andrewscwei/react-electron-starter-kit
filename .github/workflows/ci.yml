@@ -21,3 +21,14 @@ jobs:
       with:
         name: out
         path: out/
+  build_on_win:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@master
+      with:
+        node-version: 16.3.0
+    - name: Install Node modules
+      run: npm install
+    - name: Build
+      run: npm run dist:win
