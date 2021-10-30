@@ -33,6 +33,8 @@ See `scripts` in `package.json` for additional commands.
 
 ## macOS
 
+> For more details see https://www.electronjs.org/docs/latest/tutorial/code-signing and https://github.com/electron/electron-osx-sign/wiki/1.-Getting-Started#certificates
+
 When distributing an Electron app for macOS, you need to code-sign and notarize it in order for it to clear macOS security. To do so, you need to prepare the following:
 1. Enroll in the [Apple Developer Program](https://developer.apple.com/programs/)
 2. Make note of your team ID
@@ -51,13 +53,14 @@ When distributing an Electron app for macOS, you need to code-sign and notarize 
     1. Log in to [Member Center](https://developer.apple.com/membercenter/)
     2. Go to **Certificates, Identifiers & Profiles**
     3. Under **Certificates**, click the plus button
-    4. Select **Developer ID Application** (`Developer ID Application: * (*)`), then repeat (in step 7) for **Developer ID Installer** (`Developer ID Installer: * (*)`) for distribution outside the Mac App Store; or select **Mac App Distribution** (`3rd Party Mac Developer Application: * (*)`), then repeat (in step 7) for **Mac Installer Distribution** (`3rd Party Mac Developer Installer: * (*)`) for distribution inside the Mac App Store
+    4. Select one of the following:
+        1. **Developer ID Application** (`Developer ID Application: * (*)`) or **Developer ID Installer** (`Developer ID Installer: * (*)`) for distribution outside the Mac App Store
+        2. **Mac App Distribution** (`3rd Party Mac Developer Application: * (*)`) or **Mac Installer Distribution** (`3rd Party Mac Developer Installer: * (*)`) for distribution inside the Mac App Store
     5. Upon clicking **Continue**, you will be prompted to upload a CSR file, so select the `.certSigningRequest` file you just created
     6. Once the certificate is created, download it and open it with the **Keychain Access** app on your Mac
-    7. Repeat for the second certificate
-    8. When you have both certificates in **Keychain Access**, select both, then right click and export both items to a `.p12` file
-    9. Provide a secure password, make note of this password
-    10. Encode the `.p12` file to base-64 string: `base64 -i Certificates.p12`
+    7. When you have both certificates in **Keychain Access**, select both, then right click and export both items to a `.p12` file
+    8. Provide a secure password, make note of this password
+    9. Encode the `.p12` file to base-64 string: `base64 -i Certificates.p12`
 4. Prepare the following environment variables for later use in the CI environment:
     ```sh
     # Apple ID (email) with a registered developer account
@@ -66,7 +69,8 @@ When distributing an Electron app for macOS, you need to code-sign and notarize 
     # Apple ID password (recommend generating and using an app-specific password)
     MAC_CODE_SIGN_APPLE_ID_PASSWORD
 
-    # The identity name of the Developer ID Application or Mac App Distribution certificate (i.e. "Developer ID Application: <your_name> (<your_team_id>)")
+    # The identity name of the Developer ID Application or Mac App Distribution certificate (i.e.
+    # "Developer ID Application: <your_name> (<your_team_id>)")
     MAC_CODE_SIGN_IDENTITY
 
     # The base-64 encoded string of the .p12 file
