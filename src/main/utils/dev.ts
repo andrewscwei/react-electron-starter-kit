@@ -1,4 +1,4 @@
-import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from 'electron-devtools-installer'
+import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer'
 import reload from 'electron-reload'
 import path from 'path'
 import log from './log'

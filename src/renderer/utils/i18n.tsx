@@ -1,5 +1,6 @@
 import Polyglot from 'node-polyglot'
 
+const defaultLocale = __I18N_CONFIG__.defaultLocale
 const locales = __I18N_CONFIG__.locales
 const dict = __I18N_CONFIG__.dict
 const polyglots: { [locale: string]: Polyglot } = {}
@@ -26,21 +27,31 @@ for (const locale in dict) {
 }
 
 /**
+ * Gets the default locale of this app.
+ *
+ * @returns The default locale.
+ */
+export function getDefaultLocale(): string {
+  return defaultLocale
+}
+
+/**
  * Infers the current locale from a URL.
  *
  * @param path - The URL path.
  *
- * @returns The inferred locale or the default locale if inferrence is not possible.
+ * @returns The inferred locale if it exists.
  */
-export function getLocaleFromPath(path: string): string {
+export function getLocaleFromPath(path: string): string | null {
   const locales = __I18N_CONFIG__.locales
-  const possibleLocale = path.split('/')[1]
+  const normalizedPath = path.replace(/\/*$/, '') + '/'
+  const possibleLocale = normalizedPath.split('/')[1]
 
   if (~locales.indexOf(possibleLocale)) {
     return possibleLocale
   }
   else {
-    return locales[0]
+    return null
   }
 }
 
@@ -64,6 +75,24 @@ export function getLocalizedPath(path: string, locale: string = __I18N_CONFIG__.
     return `/${t.join('/')}`
   default:
     return `/${locale}/${t.join('/')}`
+  }
+}
+
+/**
+ * Returns the unlocalized version of a URL.
+ *
+ * @param path - The URL path.
+ *
+ * @returns The unlocalized path.
+ */
+export function getUnlocalizedPath(path: string): string {
+  const locale = getLocaleFromPath(path)
+
+  if (locale) {
+    return path.replace(new RegExp(`^\\/${locale}\\b`, 'i'), '/')
+  }
+  else {
+    return path
   }
 }
 

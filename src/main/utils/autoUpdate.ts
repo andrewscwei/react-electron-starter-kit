@@ -141,14 +141,14 @@ export function initAutoUpdater({ onError, onChecking, onAvailable, onUnavailabl
   })
 
   autoUpdater.on('update-available', () => {
-    log.info(`Checking for updates... OK: Began downloading update`)
+    log.info('Checking for updates... OK: Began downloading update')
     isChecking = false
     clearUpdateTimer()
     onAvailable?.()
   })
 
   autoUpdater.on('update-not-available', () => {
-    log.info(`Checking for updates... SKIP`)
+    log.info('Checking for updates... SKIP')
     isChecking = false
     onUnavailable?.()
   })
