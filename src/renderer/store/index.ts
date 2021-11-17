@@ -5,10 +5,6 @@ import i18n from './i18n'
 
 export type AppState = NonNullable<Parameters<typeof reducer>[0]>
 
-export type PartialAppState = {
-  [P in keyof AppState]?: AppState[P]
-}
-
 export type AppAction = NonNullable<Parameters<typeof reducer>[1]>
 
 export const reducer = combineReducers({
@@ -16,6 +12,6 @@ export const reducer = combineReducers({
   i18n,
 })
 
-export function createStore(initialState: PartialAppState = {}) {
+export function createStore(initialState: Partial<AppState> = {}) {
   return _createStore(reducer, initialState, applyMiddleware(thunk))
 }
