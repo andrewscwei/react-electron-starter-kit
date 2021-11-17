@@ -1,5 +1,5 @@
 {
-  "version": "1.3.1",
+  "version": "1.4.0",
   "name": "react-electron-starter-kit",
   "description": "Experimental React Electron app starter kit",
   "main": "./build/main.js",
@@ -98,7 +98,6 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.6",
-    "react-router": "^6.0.2",
     "react-router-dom": "^6.0.2",
     "react-transition-group": "^4.4.2",
     "redux": "^4.1.2",

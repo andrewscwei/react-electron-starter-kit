@@ -1,6 +1,5 @@
 import React, { Fragment, FunctionComponent, useEffect, useState } from 'react'
-import { Routes, useLocation } from 'react-router'
-import { Route } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import styled, { createGlobalStyle } from 'styled-components'
 import routesConf from '../routes.conf'
