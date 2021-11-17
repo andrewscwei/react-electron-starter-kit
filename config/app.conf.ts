@@ -23,7 +23,7 @@ export default {
    * Time it takes for the app to be marked as idle so auto update can kick in, in milliseconds.
    * Defaults to 1 hour.
    */
-  idleTimeout: 5 * 1000,
+  idleTimeout: 60 * 60 * 1000,
 
   /**
    * Specifies if the app window should launch to fullscreen in production.
