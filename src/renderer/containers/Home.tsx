@@ -1,6 +1,5 @@
 import React, { createRef, PureComponent } from 'react'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
 import { Action, bindActionCreators, Dispatch } from 'redux'
 import styled from 'styled-components'
 import Logo from '../components/Logo'
@@ -21,7 +20,7 @@ type DispatchProps = {
   resetCount: typeof reset
 }
 
-type Props = StateProps & DispatchProps & RouteComponentProps
+type Props = StateProps & DispatchProps
 
 class Home extends PureComponent<Props> {
 

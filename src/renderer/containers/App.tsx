@@ -1,57 +1,41 @@
-import React, { Fragment, PureComponent } from 'react'
-import { RouteComponentProps } from 'react-router'
-import { Route, Switch } from 'react-router-dom'
+import React, { Fragment, FunctionComponent, useEffect, useState } from 'react'
+import { Routes, useLocation } from 'react-router'
+import { Route } from 'react-router-dom'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import styled, { createGlobalStyle } from 'styled-components'
 import routesConf from '../routes.conf'
 import globalStyles from '../styles/global'
 import { deinitIdler, initIdler } from '../utils/idle'
 
-type Props = {
-  route: RouteComponentProps
-}
+const App: FunctionComponent = () => {
+  const [isIdle, setIsIdle] = useState(false)
+  const location = useLocation()
 
-type State = {
-  isIdle: boolean
-}
-
-class App extends PureComponent<Props, State> {
-
-  state: State = {
-    isIdle: false,
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     initIdler({
-      onEnter: () => this.setState({ isIdle: true }),
-      onExit: () => this.setState({ isIdle: false }),
+      onEnter: () => setIsIdle(true),
+      onExit: () => setIsIdle(false),
     })
-  }
 
-  componentWillUnmount() {
-    deinitIdler()
-  }
+    return () => {
+      deinitIdler()
+    }
+  })
 
-  render() {
-    const { route } = this.props
-
-    return (
-      <Fragment>
-        <GlobalStyles/>
-        <StyledBody>
-          <CSSTransition key={route.location.key} timeout={300} classNames='route-transition'>
-            <Switch location={route.location}>{this.generateRoutes()}</Switch>
-          </CSSTransition>
-        </StyledBody>
-      </Fragment>
-    )
-  }
-
-  private generateRoutes() {
-    return routesConf.map((route, index) => (
-      <Route exact={route.exact} path={route.path} key={`route-${index}`} component={route.component}/>
-    ))
-  }
+  return (
+    <Fragment>
+      <GlobalStyles/>
+      <StyledBody>
+        <CSSTransition key={location.key} timeout={300} classNames='route-transition'>
+          <Routes>
+            {routesConf.map((route, index) => (
+              <Route path={route.path} key={`route-${index}`} element={<route.component/>}/>
+            ))}
+          </Routes>
+        </CSSTransition>
+      </StyledBody>
+    </Fragment>
+  )
 }
 
 export default App
