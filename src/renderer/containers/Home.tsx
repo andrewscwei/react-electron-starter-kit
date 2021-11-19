@@ -1,79 +1,73 @@
-import React, { createRef, PureComponent } from 'react'
+import React, { createRef, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Action, bindActionCreators, Dispatch } from 'redux'
 import styled from 'styled-components'
 import Logo from '../components/Logo'
 import { AppState } from '../store'
 import { increment, reset } from '../store/counter'
-import { changeLocale, I18nState } from '../store/i18n'
 import app from '../utils/app'
+import { useChangeLocale, useLocale, useLtxt } from '../utils/i18n'
 
 type StateProps = {
   count: number
-  locale: I18nState['locale']
-  ltxt: I18nState['ltxt']
 }
 
 type DispatchProps = {
-  changeLocale: typeof changeLocale
   incrementCount: typeof increment
   resetCount: typeof reset
 }
 
 type Props = StateProps & DispatchProps
 
-class Home extends PureComponent<Props> {
+function Home({ count, incrementCount, resetCount }: Props) {
+  const locale = useLocale()
+  const ltxt = useLtxt()
+  const changeLocale = useChangeLocale()
 
-  private nodeRefs = {
+  const nodeRefs = {
     root: createRef<HTMLDivElement>(),
   }
 
-  componentDidMount() {
-    this.nodeRefs.root.current?.querySelectorAll('[href]').forEach(el => {
+  useEffect(() => {
+    nodeRefs.root.current?.querySelectorAll('[href]').forEach(el => {
       el.addEventListener('click', event => {
         event.preventDefault()
         const url = (event.target as HTMLElement)?.getAttribute('href')
         if (url) app?.open?.(url)
       })
     })
-  }
+  })
 
-  toggleLocale = () => {
-    if (this.props.locale === 'en') {
-      this.props.changeLocale('ja')
+  function toggleLocale() {
+    if (locale === 'en') {
+      changeLocale('ja')
     }
     else {
-      this.props.changeLocale('en')
+      changeLocale('en')
     }
   }
 
-  render() {
-    const { count, ltxt, incrementCount, resetCount } = this.props
-
-    return (
-      <StyledRoot ref={this.nodeRefs.root}>
-        <StyledLogo/>
-        <summary>
-          <h1 dangerouslySetInnerHTML={{ __html: ltxt('hello', { count0: count, count1: count*2 }) }}/>
-          <p dangerouslySetInnerHTML={{ __html: ltxt('description') }}/>
-        </summary>
-        <nav>
-          <button onClick={this.toggleLocale}>{ltxt('switch-lang')}</button>
-          <button onClick={() => incrementCount()}>{ltxt('increment')}</button>
-          <button onClick={() => resetCount()}>{ltxt('reset')}</button>
-        </nav>
-      </StyledRoot>
-    )
-  }
+  return (
+    <StyledRoot ref={nodeRefs.root}>
+      <StyledLogo/>
+      <summary>
+        <h1 dangerouslySetInnerHTML={{ __html: ltxt('hello', { count0: count, count1: count*2 }) }}/>
+        <p dangerouslySetInnerHTML={{ __html: ltxt('description') }}/>
+      </summary>
+      <nav>
+        <button onClick={toggleLocale}>{ltxt('switch-lang')}</button>
+        <button onClick={() => incrementCount()}>{ltxt('increment')}</button>
+        <button onClick={() => resetCount()}>{ltxt('reset')}</button>
+      </nav>
+    </StyledRoot>
+  )
 }
 
 export default connect(
   (state: AppState): StateProps => ({
     count: state.counter.count,
-    ...state.i18n,
   }),
   (dispatch: Dispatch<Action>): DispatchProps => bindActionCreators({
-    changeLocale,
     incrementCount: increment,
     resetCount: reset,
   }, dispatch),

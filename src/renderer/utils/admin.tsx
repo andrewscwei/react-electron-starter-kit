@@ -1,6 +1,6 @@
 import React from 'react'
 import { hydrate, render } from 'react-dom'
-import Admin from '../containers/Admin'
+import Admin from '../Admin'
 
 /**
  * Mounts the admin panel to a DOM element.

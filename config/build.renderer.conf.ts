@@ -1,4 +1,4 @@
-/// <reference path='../src/renderer/typings/custom.d.ts' />
+/// <reference path='../src/renderer/custom.d.ts' />
 /**
  * @file Webpack config for Electron's renderer process.
  */

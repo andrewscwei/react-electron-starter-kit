@@ -1,24 +1,19 @@
-import $$ElectronLogo from '../assets/images/electron-logo.svg'
 import $$ReactLogo from '!!raw-loader!../assets/images/react-logo.svg'
-import React, { PureComponent } from 'react'
+import React from 'react'
 import styled from 'styled-components'
+import $$ElectronLogo from '../assets/images/electron-logo.svg'
 
 export type Props = {
   className?: string
 }
 
-export default class Logo extends PureComponent<Props> {
-
-  render() {
-    const { className } = this.props
-
-    return (
-      <StyledRoot className={className}>
-        <StyledElectronLogo src={$$ElectronLogo}/>
-        <StyledReactLogo dangerouslySetInnerHTML={{ __html: $$ReactLogo }}/>
-      </StyledRoot>
-    )
-  }
+export default function Logo({ className }: Props) {
+  return (
+    <StyledRoot className={className}>
+      <StyledElectronLogo src={$$ElectronLogo}/>
+      <StyledReactLogo dangerouslySetInnerHTML={{ __html: $$ReactLogo }}/>
+    </StyledRoot>
+  )
 }
 
 const StyledElectronLogo = styled.img`

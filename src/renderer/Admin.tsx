@@ -13,13 +13,13 @@
 
 import classNames from 'classnames'
 import { IpcRendererEvent } from 'electron'
-import React, { PureComponent } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import IpcRendererChannel, { IpcRendererChannelPayload } from '../../enums/IpcRendererChannel'
-import UpdateStatus from '../../enums/UpdateStatus'
-import Settings from '../components/Settings'
-import app from '../utils/app'
-import log from '../utils/log'
+import IpcRendererChannel, { IpcRendererChannelPayload } from '../enums/IpcRendererChannel'
+import UpdateStatus from '../enums/UpdateStatus'
+import Settings from './components/Settings'
+import app from './utils/app'
+import log from './utils/log'
 
 /**
  * Width of the admin panel.
@@ -41,95 +41,20 @@ const ACTIVATION_MAX_TRIGGER_COUNT = 5
  */
 const ACCENT_COLOR = '#b50e0e'
 
-type Props = {
-
-}
-
-type State = {
-  activationCount: number
-  activationTimeout?: number
-  appInfo?: IpcRendererChannelPayload['APP_INFO_READY']
-  appStatus: string
-  debugEnabled: boolean
-  isActive: boolean
-  isUpdateReady: boolean
-}
-
-class Admin extends PureComponent<Props, State> {
-
-  constructor(props: Props) {
-    super(props)
-
-    this.state = {
-      activationCount: 0,
-      activationTimeout: undefined,
-      appInfo: undefined,
-      appStatus: 'WARNING: For devs only',
-      debugEnabled: false,
-      isActive: false,
-      isUpdateReady: false,
-    }
-  }
-
-  componentDidMount() {
-    app?.ipcRenderer?.on(IpcRendererChannel.APP_INFO_READY, this.onAppInfoReady)
-    app?.ipcRenderer?.on(IpcRendererChannel.DEBUG_MODE_CHANGED, this.onDebugModeChanged)
-    app?.ipcRenderer?.on(IpcRendererChannel.UPDATE_STATUS_CHANGED, this.onUpdateStatusChanged)
-
-    document.addEventListener('pointerup', this.onWindowPointerUp)
-  }
-
-  componentWillUnmount() {
-    app?.ipcRenderer?.off(IpcRendererChannel.APP_INFO_READY, this.onAppInfoReady)
-    app?.ipcRenderer?.off(IpcRendererChannel.DEBUG_MODE_CHANGED, this.onDebugModeChanged)
-    app?.ipcRenderer?.off(IpcRendererChannel.UPDATE_STATUS_CHANGED, this.onUpdateStatusChanged)
-
-    document.removeEventListener('pointerup', this.onWindowPointerUp)
-
-    if (this.state.activationTimeout) clearTimeout(this.state.activationTimeout)
-  }
-
-  render() {
-    const { appInfo, appStatus, debugEnabled, isUpdateReady, isActive } = this.state
-
-    return (
-      <StyledRoot isActive={isActive}>
-        <StyledStatus>
-          <span>{appStatus}</span>
-        </StyledStatus>
-        <StyledHeader>
-          <h1>{appInfo?.name ?? '???'}</h1>
-          <aside>
-            <span>{`v${appInfo?.version ?? '???'}`}</span>
-            <span>{appInfo?.ip ?? '???.???.???.???'}</span>
-          </aside>
-        </StyledHeader>
-        <StyledSettings/>
-        <StyledControls>
-          <StyledControlButton className={classNames({ active: debugEnabled })} onClick={() => app?.toggleDebugMode()}>Debug Mode</StyledControlButton>
-          <StyledControlButton onClick={() => app?.checkForUpdates()} disabled={!__APP_CONFIG__.autoUpdate}>Check Updates</StyledControlButton>
-          <StyledControlButton onClick={() => app?.installUpdates()} disabled={!__APP_CONFIG__.autoUpdate || !isUpdateReady}>Install updates</StyledControlButton>
-          <StyledControlButton onClick={() => app?.reloadWindow()}>Reload Window</StyledControlButton>
-          <StyledControlButton onClick={() => app?.quitApp()}>Quit App</StyledControlButton>
-          <StyledControlButton onClick={() => this.deactivate()}>Close Panel</StyledControlButton>
-        </StyledControls>
-      </StyledRoot>
-    )
-  }
-
+export default function Admin() {
   /**
    * Activates the admin panel.
    */
-  private activate() {
-    this.cancelPendingActivation()
-    this.setState({ isActive: true })
+   function activate() {
+    cancelPendingActivation()
+    setIsActive(true)
   }
 
   /**
    * Deactivates the admin panel.
    */
-  private deactivate() {
-    this.setState({ isActive: false })
+  function deactivate() {
+    setIsActive(false)
   }
 
   /**
@@ -139,8 +64,8 @@ class Admin extends PureComponent<Props, State> {
    * @param event - The IPC event.
    * @param appInfo - The app info.
    */
-  private onAppInfoReady = (event: IpcRendererEvent, appInfo: IpcRendererChannelPayload['APP_INFO_READY']) => {
-    this.setState({ appInfo })
+  function onAppInfoReady(event: IpcRendererEvent, appInfo: IpcRendererChannelPayload['APP_INFO_READY']) {
+    setAppInfo(appInfo)
   }
 
   /**
@@ -150,8 +75,8 @@ class Admin extends PureComponent<Props, State> {
    * @param event - The IPC event.
    * @param isEnabled - Whether debug mode is enabled after the change.
    */
-  private onDebugModeChanged = (event: IpcRendererEvent, isEnabled: IpcRendererChannelPayload['DEBUG_MODE_CHANGED']) => {
-    this.setState({ debugEnabled: isEnabled })
+  function onDebugModeChanged(event: IpcRendererEvent, isEnabled: IpcRendererChannelPayload['DEBUG_MODE_CHANGED']){
+    setDebugEnabled(isEnabled)
   }
 
   /**
@@ -161,31 +86,28 @@ class Admin extends PureComponent<Props, State> {
    * @param event - The IPC event
    * @param data - The emitted by this event.
    */
-  private onUpdateStatusChanged = (event: IpcRendererEvent, data: IpcRendererChannelPayload['UPDATE_STATUS_CHANGED']) => {
+  function onUpdateStatusChanged(event: IpcRendererEvent, data: IpcRendererChannelPayload['UPDATE_STATUS_CHANGED']) {
     switch (data.status) {
     case UpdateStatus.AVAILABLE:
       log.info('Checking for updates... OK: Update is available, downloading...')
-      this.setState({ appStatus: 'Downloading available update...' })
+      setAppStatus('Downloading available update...')
       break
     case UpdateStatus.UNAVAILABLE:
       log.info('Checking for updates... OK: App is up-to-date')
-      this.setState({ appStatus: 'App is up-to-date' })
+      setAppStatus('App is up-to-date')
       break
     case UpdateStatus.CHECKING:
       log.info('Checking for updates...')
-      this.setState({ appStatus: 'Checking for updates...' })
+      setAppStatus('Checking for updates...')
       break
     case UpdateStatus.ERROR:
       log.error(`Checking for updates... ERR: ${data.error}`)
-      this.setState({ appStatus: `${data.error}` })
+      setAppStatus(`${data.error}`)
       break
     case UpdateStatus.DOWNLOADED:
       log.info('Checking for updates... OK: Successfully downloaded update')
-
-      this.setState({
-        isUpdateReady: true,
-        appStatus: 'Update is ready to be installed',
-      })
+      setIsUpdateReady(true)
+      setAppStatus('Update is ready to be installed')
       break
     }
   }
@@ -199,43 +121,88 @@ class Admin extends PureComponent<Props, State> {
    *
    * @param event - The `PointerEvent`.
    */
-  private onWindowPointerUp = ({ clientX: x, clientY: y }: PointerEvent) => {
-    if (x > 100 || y > 100) return this.cancelPendingActivation()
+  function onWindowPointerUp({ clientX: x, clientY: y }: PointerEvent) {
+    if (x > 100 || y > 100) return cancelPendingActivation()
 
-    this.setState({ activationCount: this.state.activationCount + 1 })
-    this.waitForActivation()
+    const count = activationCount + 1
+    setActivationCount(count)
+    waitForActivation()
 
-    if (this.state.activationCount < ACTIVATION_MAX_TRIGGER_COUNT) return
+    if (count < ACTIVATION_MAX_TRIGGER_COUNT) return
 
-    this.activate()
+    activate()
   }
 
   /**
    * Initiates the activation process. Begin counting the number of pointer up events and ensure
    * that consecutive events are within a specified time interval.
    */
-  private waitForActivation() {
-    if (this.state.activationTimeout) clearTimeout(this.state.activationTimeout)
+  function waitForActivation() {
+    if (activationTimeout) clearTimeout(activationTimeout)
 
-    this.setState({
-      activationTimeout: window.setTimeout(() => this.cancelPendingActivation(), ACTIVATION_TIMEOUT_INTERVAL),
-    })
+    setActivationTimeout(window.setTimeout(() => cancelPendingActivation(), ACTIVATION_TIMEOUT_INTERVAL))
   }
 
   /**
    * Cancels the activation process altogether, resets the click count to 0.
    */
-  private cancelPendingActivation() {
-    if (this.state.activationTimeout) clearTimeout(this.state.activationTimeout)
+  function cancelPendingActivation() {
+    if (activationTimeout) clearTimeout(activationTimeout)
 
-    this.setState({
-      activationTimeout: undefined,
-      activationCount: 0,
-    })
+    setActivationTimeout(undefined)
+    setActivationCount(0)
   }
-}
 
-export default Admin
+  const [activationCount, setActivationCount] = useState(0)
+  const [activationTimeout, setActivationTimeout] = useState<number | undefined>(undefined)
+  const [appInfo, setAppInfo] = useState<IpcRendererChannelPayload['APP_INFO_READY'] | undefined>(undefined)
+  const [appStatus, setAppStatus] = useState('WARNING: For devs only')
+  const [debugEnabled, setDebugEnabled] = useState(false)
+  const [isUpdateReady, setIsUpdateReady] = useState(false)
+  const [isActive, setIsActive] = useState(false)
+
+  useEffect(() => {
+    app?.ipcRenderer?.on(IpcRendererChannel.APP_INFO_READY, onAppInfoReady)
+    app?.ipcRenderer?.on(IpcRendererChannel.DEBUG_MODE_CHANGED, onDebugModeChanged)
+    app?.ipcRenderer?.on(IpcRendererChannel.UPDATE_STATUS_CHANGED, onUpdateStatusChanged)
+
+    document.addEventListener('pointerup', onWindowPointerUp)
+
+    return () => {
+      app?.ipcRenderer?.off(IpcRendererChannel.APP_INFO_READY, onAppInfoReady)
+      app?.ipcRenderer?.off(IpcRendererChannel.DEBUG_MODE_CHANGED, onDebugModeChanged)
+      app?.ipcRenderer?.off(IpcRendererChannel.UPDATE_STATUS_CHANGED, onUpdateStatusChanged)
+
+      document.removeEventListener('pointerup', onWindowPointerUp)
+
+      if (activationTimeout) clearTimeout(activationTimeout)
+    }
+  })
+
+  return (
+    <StyledRoot isActive={isActive}>
+      <StyledStatus>
+        <span>{appStatus}</span>
+      </StyledStatus>
+      <StyledHeader>
+        <h1>{appInfo?.name ?? '???'}</h1>
+        <aside>
+          <span>{`v${appInfo?.version ?? '???'}`}</span>
+          <span>{appInfo?.ip ?? '???.???.???.???'}</span>
+        </aside>
+      </StyledHeader>
+      <StyledSettings/>
+      <StyledControls>
+        <StyledControlButton className={classNames({ active: debugEnabled })} onClick={() => app?.toggleDebugMode()}>Debug Mode</StyledControlButton>
+        <StyledControlButton onClick={() => app?.checkForUpdates()} disabled={!__APP_CONFIG__.autoUpdate}>Check Updates</StyledControlButton>
+        <StyledControlButton onClick={() => app?.installUpdates()} disabled={!__APP_CONFIG__.autoUpdate || !isUpdateReady}>Install updates</StyledControlButton>
+        <StyledControlButton onClick={() => app?.reloadWindow()}>Reload Window</StyledControlButton>
+        <StyledControlButton onClick={() => app?.quitApp()}>Quit App</StyledControlButton>
+        <StyledControlButton onClick={() => deactivate()}>Close Panel</StyledControlButton>
+      </StyledControls>
+    </StyledRoot>
+  )
+}
 
 const StyledStatus = styled.div`
   align-items: center;

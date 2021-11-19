@@ -1,4 +1,4 @@
-import App from './containers/App'
+import App from './App'
 import { mountAdminPanel } from './utils/admin'
 import { mount } from './utils/dom'
 import log from './utils/log'

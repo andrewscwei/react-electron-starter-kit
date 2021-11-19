@@ -7,9 +7,11 @@ import { hydrate, render } from 'react-dom'
 import { Provider } from 'react-redux'
 import { HashRouter, HashRouterProps } from 'react-router-dom'
 import { Store } from 'redux'
-import { ThemeProvider } from 'styled-components'
+import { createGlobalStyle, ThemeProvider } from 'styled-components'
 import { AppAction, AppState, createStore } from '../store'
+import globalStyle from '../styles/global'
 import * as theme from '../styles/theme'
+import { I18nProvider } from './i18n'
 
 type MarkupOptions = {
   store?: Store<AppState, AppAction>
@@ -24,15 +26,24 @@ type MarkupOptions = {
 *
 * @returns The JSX markup.
 */
-export function markup(Component: ComponentType, { store = createStore(), hashRouter }: MarkupOptions = {}): JSX.Element {
+export function markup(Component: ComponentType, { store = createStore(), hashRouter }: MarkupOptions = {}) {
+  const GlobalStyle = createGlobalStyle`
+    ${globalStyle}
+  `
+
   return (
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <HashRouter {...hashRouter}>
-          <Component/>
-        </HashRouter>
-      </ThemeProvider>
-    </Provider>
+    <>
+      <GlobalStyle/>
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <HashRouter {...hashRouter}>
+            <I18nProvider>
+              <Component/>
+            </I18nProvider>
+          </HashRouter>
+        </ThemeProvider>
+      </Provider>
+    </>
   )
 }
 
