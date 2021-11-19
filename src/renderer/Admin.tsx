@@ -45,7 +45,7 @@ export default function Admin() {
   /**
    * Activates the admin panel.
    */
-   function activate() {
+  function activate() {
     cancelPendingActivation()
     setIsActive(true)
   }
@@ -75,7 +75,7 @@ export default function Admin() {
    * @param event - The IPC event.
    * @param isEnabled - Whether debug mode is enabled after the change.
    */
-  function onDebugModeChanged(event: IpcRendererEvent, isEnabled: IpcRendererChannelPayload['DEBUG_MODE_CHANGED']){
+  function onDebugModeChanged(event: IpcRendererEvent, isEnabled: IpcRendererChannelPayload['DEBUG_MODE_CHANGED']) {
     setDebugEnabled(isEnabled)
   }
 
