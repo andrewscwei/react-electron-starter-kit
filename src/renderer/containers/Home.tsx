@@ -1,4 +1,4 @@
-import React, { createRef, useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { connect } from 'react-redux'
 import { Action, bindActionCreators, Dispatch } from 'redux'
 import styled from 'styled-components'
@@ -20,16 +20,13 @@ type DispatchProps = {
 type Props = StateProps & DispatchProps
 
 function Home({ count, incrementCount, resetCount }: Props) {
+  const rootRef = useRef<HTMLDivElement>(null)
   const locale = useLocale()
   const ltxt = useLtxt()
   const changeLocale = useChangeLocale()
 
-  const nodeRefs = {
-    root: createRef<HTMLElement>(),
-  }
-
   useEffect(() => {
-    nodeRefs.root.current?.querySelectorAll('[href]').forEach(el => {
+    rootRef.current?.querySelectorAll('[href]').forEach(el => {
       el.addEventListener('click', event => {
         event.preventDefault()
         const url = (event.target as HTMLElement)?.getAttribute('href')
@@ -48,7 +45,7 @@ function Home({ count, incrementCount, resetCount }: Props) {
   }
 
   return (
-    <StyledRoot ref={nodeRefs.root}>
+    <StyledRoot ref={rootRef}>
       <StyledLogo/>
       <summary>
         <h1 dangerouslySetInnerHTML={{ __html: ltxt('hello', { count0: count, count1: count*2 }) }}/>
