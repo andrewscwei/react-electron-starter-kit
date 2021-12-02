@@ -3,7 +3,7 @@ import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 import $$ElectronLogo from '../assets/images/electron-logo.svg'
 
-export type Props = HTMLAttributes<HTMLDivElement>
+export type Props = HTMLAttributes<HTMLElement>
 
 export default function Logo({ ...props }: Props) {
   return (

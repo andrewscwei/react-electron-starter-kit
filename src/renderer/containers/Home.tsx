@@ -25,7 +25,7 @@ function Home({ count, incrementCount, resetCount }: Props) {
   const changeLocale = useChangeLocale()
 
   const nodeRefs = {
-    root: createRef<HTMLDivElement>(),
+    root: createRef<HTMLElement>(),
   }
 
   useEffect(() => {
