@@ -1,13 +1,11 @@
-import React from 'react'
+import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-type Props = {
-  className?: string
-}
+type Props = HTMLAttributes<HTMLDivElement>
 
-export default function Settings({ className }: Props) {
+export default function Settings({ ...props }: Props) {
   return (
-    <StyledRoot className={className}>
+    <StyledRoot {...props}>
 
     </StyledRoot>
   )
