@@ -2,10 +2,6 @@
  * @file Enum of IPC channels and payloads to be handled on the main process.
  */
 
-export type IpcMainChannelPayload = {
-
-}
-
 export default {
   CHECK_FOR_UPDATES: '@ipcMain/CHECK_FOR_UPDATES',
   ENTER_IDLE_MODE: '@ipcMain/ENTER_IDLE_MODE',

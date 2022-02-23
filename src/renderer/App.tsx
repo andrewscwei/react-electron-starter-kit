@@ -4,7 +4,7 @@ import Home from './containers/Home'
 import { deinitIdler, initIdler } from './utils/idle'
 
 export default function App() {
-  const [isIdle, setIsIdle] = useState(false)
+  const [, setIsIdle] = useState(false)
 
   useEffect(() => {
     initIdler({

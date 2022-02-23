@@ -11,7 +11,8 @@ This is an **experimental** starter kit for a React Electron app.
 5. [Redux](https://redux.js.org/introduction)
 6. [Polyglot](http://airbnb.io/polyglot.js/)
 7. [Styled Components](https://www.styled-components.com/)
-8. [ESLint](https://eslint.org/) and [StyleLint](https://stylelint.io/) config
+8. [Jest](https://jestjs.io/) config
+9. [ESLint](https://eslint.org/) config
 
 ## Usage
 
