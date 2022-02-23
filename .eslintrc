@@ -195,10 +195,7 @@
         "after": true
       }
     ],
-    "linebreak-style": [
-      "error",
-      "unix"
-    ],
+    "linebreak-style": "off",
     "max-classes-per-file": [
       "error",
       1
